@@ -53,6 +53,8 @@ test:
     - cp -R ./* $DRUPAL_SITE_PATH/profiles/ding2/
     # Install the site using the ding2 profile
     - (cd $DRUPAL_SITE_PATH && drush site-install ding2 --db-url=mysql://ubuntu@127.0.0.1/circle_test -y)
+    # Create a writable files directory.
+    - (cd $DRUPAL_SITE_PATH/sites/default && mkdir files && sudo chown www-data. files)
     # Set up test site.
     - (cd $DRUPAL_SITE_PATH/profiles/ding2/tests && make test-setup && make mock-use && make mock-playback)
     # Run Behat tests.
