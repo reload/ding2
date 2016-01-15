@@ -18,7 +18,7 @@ setup-modules:
 
 # Prepare mock server.
 prepare-mock:
-	git clone -b host-header git@github.com:reload/mock-http-server.git
+	git clone -b close-connection git@github.com:reload/mock-http-server.git
 	cd mock-http-server && npm install
 
 # 
