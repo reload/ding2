@@ -13,7 +13,7 @@ Feature: Public lists
     When I make the list "My Harry Potter books" public
     Then I should see that the list "My Harry Potter books" is public
 
-  @api @no_messages_check @javascript
+  @api @no_messages_check @javascript @wip
   Scenario: See public list on public-lists
     Given I have created a list "My Sci Fi novels"
     And I have made the list "My Sci Fi novels" public
@@ -32,7 +32,7 @@ Feature: Public lists
     When I unfollow the list with the title "Books about flowers"
     Then I should not see the list "Books about flowers" on lists I follow
 
-  @api @no_messages_check @javascript
+  @api @no_messages_check @javascript @wip
   Scenario: Add content to a public list
     Given I have created a public list "My action movies"
     When I add material "Die hard 4.0" to the list "My action movies"

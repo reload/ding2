@@ -7,13 +7,13 @@ Feature: Follow author
     Given I am logged in as a library user
     Then The list "follow author" exists
 
-  @api
+  @api @wip
   Scenario: Follow author
     Given I have searched for "George Orwell 1984"
     When I add the author to authors I follow
     Then I should see "George Orwell" on the list of followed authors
 
-  @api
+  @api @wip
   Scenario: Unfollow author
     Given I have followed the author "George Orwell"
     When I remove the author "George Orwell" from followed authors
