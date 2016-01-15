@@ -43,13 +43,13 @@ setup-phantomjs:
 	phantomjs --webdriver=4444 &
 
 # Start mock server in recording mode.
-mock-record: mock-use
+mock-record:
 	mkdir -p fixtures/opensearch fixtures/openlist
 	./mock-http-server/bin/mock-http-server 9000 --record=opensearch.addi.dk --fixtures=fixtures/opensearch &
 	./mock-http-server/bin/mock-http-server 9001 --record=v2_test.openlist.server003.b14cms.dk --fixtures=fixtures/openlist &
 
 # Start mock server in playback mode.
-mock-playback: mock-use
+mock-playback:
 	./mock-http-server/bin/mock-http-server 9000 --fixtures=fixtures/opensearch &
 	./mock-http-server/bin/mock-http-server 9001 --fixtures=fixtures/openlist &
 
