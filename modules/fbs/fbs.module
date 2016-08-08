@@ -191,6 +191,40 @@ function fbs_settings_form() {
     '#description' => t('Allow users to delete their reservations as well as ready for pickup ones.'),
   );
 
+  // Update list of branches.
+  $form['update'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Update from library system'),
+  );
+
+  $form['update']['fbs_branches_last_updated'] = array(
+    '#markup' => '<label>Last updated:</label>' . (variable_get('fbs_branches_last_updated', 0) ? date('Y-m-d H:i:s', variable_get('fbs_branches_last_updated')) : '<em>' . t('Never') . '</em>'),
+  );
+
+  $form['update']['fbs_update'] = array(
+    '#type' => 'actions',
+    'submit' => array(
+      '#type' => 'submit',
+      '#value' => t('Update list')
+    ),
+  );
+
+  $form['branches'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'branches',
+  );
+
+  $fbs_branches = variable_get('fbs_branches', array('3213651' => 'Branch 1', '5649684' => 'Branch 2'));
+  foreach ($fbs_branches as $id => $branch) {
+    $form['branches']['fbs_branch_' . $id] = array(
+      '#type' => 'checkbox',
+      '#title' => check_plain($branch),
+      '#default_value' => variable_get('fbs_branch_' . $id, 0),
+    );
+  }
+
+  $form['#submit'][] = 'fbs_settings_form_submit';
+
   return system_settings_form($form);
 }
 
@@ -201,6 +235,12 @@ function fbs_settings_form_submit($form, &$form_state) {
   foreach ($form_state['values'] as $name => $value) {
     $form_state['values'][$name] = trim($value);
   }
+
+  if (in_array('fbs_update', array_values($form_state['triggering_element']['#array_parents']))) {
+    // Update fbs.
+    $branches = fbs_branches();
+  }
+
   system_settings_form_submit($form, $form_state);
 }
 
