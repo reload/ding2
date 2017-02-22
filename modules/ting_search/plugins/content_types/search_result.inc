@@ -210,21 +210,22 @@ function search_do_secondary_search($keys) {
 function search_zerohit_suggest($keys) {
 
   $settings = ting_search_autocomplete_settings();
-  //$url = variable_get('ting_search_autocomplete_suggestion_url', '');
-  $url = 'http://opensuggestion.addi.dk/b3.0_2.0/';
-  $url = $url . 'rest/facetSpell';
+  $url = variable_get('ting_search_autocomplete_suggestion_url', '') . 'rest/facetSpell';
 
   $options['query'] = array('query' => check_plain($keys)) + $settings;
   $options['maxTime'] = 300;
   $url = url($url, $options);
-  $content = file_get_contents($url);
   $curl = new MicroCURL();
+  $headers[] = "Accept: application/json";
+  $curl->set_option(CURLOPT_HTTPHEADER, $headers);
   $result = json_decode($curl->get(array($url)));
   $curl->close();
 
   $items = array();
-  if (!empty($result->suggestions)) {
-    foreach ($result->suggestions as $suggestion) {
+  // First child of $result changes name from suggestions to suggestion when
+  // switching between version 3.0 and 3.5
+  if (!empty(current($result))) {
+    foreach (current($result) as $suggestion) {
       return $suggestion->phrase;
     }
   }
