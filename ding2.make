@@ -223,6 +223,11 @@ projects[message][version] = "1.10"
 projects[metatag][subdir] = "contrib"
 projects[metatag][version] "1.10"
 
+projects[microcurl][type] = module
+projects[microcurl][download][type] = git
+projects[microcurl][download][url] = git@github.com:DBCDK/microcurl.git
+projects[microcurl][download][tag] = 7.x-0.2
+
 projects[mmeu][subdir] = "contrib"
 projects[mmeu][version] = "1.0"
 
