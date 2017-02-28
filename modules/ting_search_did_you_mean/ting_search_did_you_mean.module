@@ -72,8 +72,9 @@ function ting_search_did_you_mean_ting_search_results($keys = NULL, $conditions 
  * Implements hook_ting_search_set_messages().
  */
 function ting_search_did_you_mean_ting_search_set_messages() {
-
-  return implode(drupal_static('did_you_mean_messages'));
+  if (is_array(drupal_static('did_you_mean_messages'))) {
+    return implode(drupal_static('did_you_mean_messages'));
+  }
 }
 
 /**
