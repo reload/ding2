@@ -987,3 +987,31 @@ function _ting_search_quote($string) {
   $cqlDoc = new TingSearchCqlDoctor($string);
   return $cqlDoc->string_to_cql($string);
 }
+
+/**
+ * Do a secondary search juggling around the drupal static.
+ *
+ * @param string $keys
+ *   The search phrase.
+ *
+ * @return Object TingClientSearchResult
+ *   The search result of the secondary search.
+ */
+function ting_search_do_secondary_search($keys) {
+
+  // Store search result temporarily. We need to make seconday search.
+  $temporary_search_result = drupal_static('ting_search_results');
+
+  // Reset the static containing search result to be able do new search.
+  drupal_static_reset('ting_search_search_execute');
+
+  // Search for the secondary keys.
+  ting_search_search_execute($keys, array('sort' => ''));
+  $secondary_result = drupal_static('ting_search_results');
+
+  // Overwrite the static with the original search.
+  $revert = &drupal_static('ting_search_results');
+  $revert = $temporary_search_result;
+
+  return $secondary_result;
+}
