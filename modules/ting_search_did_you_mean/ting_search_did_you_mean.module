@@ -116,3 +116,23 @@ function ting_search_did_you_mean_suggest_keys($keys) {
     return FALSE;
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ting_search_did_you_mean_form_ting_admin_ting_settings_alter(&$form, &$form_state) {
+  $form['additional_search']['#type'] = 'fieldset';
+  $form['additional_search']['#title'] = t('Additional Search');
+  $form['additional_search']['#tree'] = FALSE;
+
+  $form['additional_search']['do_you_mean_guess'] = array(
+    '#type' => 'radios',
+    '#title' => t('Guess engine'),
+    '#default_value' => variable_get('do_you_mean_guess', FALSE),
+    '#options' => array(
+      0 => t('KPI Index'),
+      1 => t('OpenSuggestion'),
+    ),
+    '#description' => t('Choose the guess engine'),
+  );
+}
