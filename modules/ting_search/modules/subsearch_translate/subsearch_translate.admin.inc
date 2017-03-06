@@ -24,7 +24,7 @@ function subsearch_translate_form_ting_admin_ting_settings_alter(&$form, &$form_
 
   $form['additional_search']['translated_suggestion_google_key'] = array(
     '#type' => 'textfield',
-    '#title' => t('Google Apikey'),
+    '#title' => t('Translated Search: Google Apikey'),
     '#default_value' => variable_get('translated_suggestion_google_key', '')
   );
 }

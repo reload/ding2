@@ -17,14 +17,14 @@ function subsearch_translate_ting_search_results($keys = NULL, $conditions = NUL
 
   // If no google api key is set we cannot translate.
   if (empty(variable_get('translated_suggestion_google_key', ''))) {
-    return;
+    return $messages;
   }
 
   // If any of fiction or non fiction is empty we cannot do the calculation.
   // Simply exit for now.
   if (empty($results->facets['facet.genreCategory']->terms['nonfiktion'])
   || empty($results->facets['facet.genreCategory']->terms['fiktion'])) {
-    return;
+    return $messages;
   }
   $nonfiction = $results->facets['facet.genreCategory']->terms['nonfiktion'];
   $fiction = $results->facets['facet.genreCategory']->terms['fiktion'];
