@@ -1,0 +1,164 @@
+<?php
+/**
+ * @file
+ * Enables search integration with Ting.
+ */
+
+// Load Field module hooks.
+module_load_include('inc', 'subsearch_kpi', 'subsearch_kpi.admin');
+
+/**
+ * Implements hook_ting_search_results().
+ */
+function subsearch_kpi_ting_search_results($keys = NULL, $conditions = NULL, $results) {
+
+  $messages = array();
+
+  if (variable_get('do_you_mean_guess', FALSE) != 'kpi' || !$keys) {
+    return;
+  }
+
+  // When a zero-hit search is executed and we're able to match "correct"
+  // keys, a new search is done with the "correct" keys.
+  // Then use the query-parameter original-keys to display what was done to
+  // the visitor.
+  $parameters = drupal_get_query_parameters();
+  if (isset($parameters['original-search'])) {
+    $msg = t('Did you mean "!keys?" which gave !num-results. The search was executed. The search for "!original-keys" returned 0 hits.', array(
+      '!original-keys' => $parameters['original-search'],
+      '!keys' => $keys,
+      '!num-results' => $results->numTotalObjects,
+    ));
+
+    $messages[] = '<div class="messages warning">' . $msg . '</div>';
+  }
+
+  if ($results->numTotalObjects == 0) {
+    // The search result returned zero-hits so we need to see if "correct" keys
+    // can yield a better result.
+    $search_result = drupal_static('ting_search_results');
+    // Find suggestions for "correct" search phrase.
+    $suggestion = subsearch_kpi_suggest_keys($keys);
+
+    if (!empty($suggestion)) {
+      // Do secondary search for "correct" keys.
+      $secondary_result = ting_search_do_secondary_search($suggestion);
+      // Only redirect to "correct" keys search if it has a positive result.
+      if ($secondary_result->numTotalObjects > 0) {
+        $params['query'] = array(
+          'original-search' => $search_result->search_key
+        );
+        drupal_goto('search/ting/' . strtolower($suggestion), $params);
+      }
+    }
+  }
+
+  if ($results->numTotalObjects <= variable_get('do_you_mean_case_4_minimum', 5)) {
+    $suggestion = subsearch_kpi_suggest_keys($keys);
+    if ($suggestion) {
+      // Do aditional search.
+      $suggested_result = ting_search_do_secondary_search($suggestion);
+      if ($suggested_result->numTotalObjects >= 10) {
+
+        // Set message!
+        $msg = t('The search for "!keys" returned !num-results hits. Did you mean "<a href="/search/ting/!suggested-keys">!suggested-keys</a>?" which will return !suggested-num-results hits.', array(
+          '!suggested-keys' => strtolower($suggestion),
+          '!suggested-num-results' => $suggested_result->numTotalObjects,
+          '!keys' => $keys,
+          '!num-results' => $results->numTotalObjects,
+        ));
+        $messages[] = '<div class="messages warning">' . $msg . '</div>';
+      }
+    }
+  }
+  return $messages;
+}
+
+/**
+ * Find the first suggestion for given keys.
+ *
+ * @param string $keys
+ *   The original keys that you want to find suggestion for.
+ *
+ * @return string
+ *   The suggestion.
+ */
+function subsearch_kpi_suggest_keys($keys) {
+
+  $kpi_index = db_select('kpi_index_popular_keys', 'k')
+    ->fields('k')
+    ->condition('numtotalsearches', variable_get('do_you_mean_minimum_searches', 10),'>')
+    ->orderBy('numtotalsearches', 'DESC')
+    ->execute();
+
+  while($record = $kpi_index->fetchAssoc()) {
+    $distance = levenshtein(strtolower($keys), strtolower($record['popular_keys']));
+    if ($distance < variable_get('do_you_mean_kpi_distance', 0)) {
+      return $record['popular_keys'];
+    }
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function subsearch_kpi_cron() {
+
+  // Ensure that local data is only renewed once a day.
+  if (!(variable_get('subsearch_kpi_cron_run', 0) < time())) {
+    return;
+  }
+
+  $endpoint = variable_get('subsearch_kpi_webservice_endpoint', NULL);
+  $params['start_period'] = variable_get('subsearch_kpi_start_period', NULL);
+  $params['end_period'] = variable_get('subsearch_kpi_end_period', NULL);
+  $params['format'] = variable_get('subsearch_kpi_format', NULL);
+  $params['language'] = variable_get('subsearch_kpi_language', NULL);
+
+  $account = variable_get('subsearch_kpi_account', NULL);
+  $password = variable_get('subsearch_kpi_password', NULL);
+
+  if (empty($endpoint) || empty($account) || empty($password)) {
+    watchdog('subsearch_kpi', 'Module not configured properly', array(), WATCHDOG_WARNING);
+    return;
+  }
+
+  $options['query'] = $params;
+  $options['maxTime'] = 300;
+  $url = url($endpoint, $options);
+
+  $curl = new MicroCURL();
+  $headers[] = "Accept: application/json";
+  $curl->set_authentication($account, $password);
+  $curl->set_option(CURLOPT_HTTPHEADER, $headers);
+  $result = json_decode($curl->get(array($url)));
+  $curl->close();
+
+  if (!empty($result)) {
+    subsearch_kpi_insert_records($result);
+    variable_set('subsearch_kpi_cron_run', time() + (60*60*24));
+    watchdog('subsearch_kpi', 'Data fetched from KPI. Will re-run in day.', array(), WATCHDOG_INFO);
+  }
+  else {
+    watchdog('subsearch_kpi', 'No data fetched from feed', array(), WATCHDOG_WARNING);
+  }
+}
+
+/**
+ * Insert kpi keys into table.
+ */
+function subsearch_kpi_insert_records($json) {
+
+  db_truncate('kpi_index_popular_keys')->execute();
+
+  foreach ($json->data[0]->SubRows[0] as $keys => $data) {
+    $query = db_insert('kpi_index_popular_keys')->fields(
+      array(
+        'id' => md5($keys),
+        'popular_keys' => $keys,
+        'numtotalsearches' => (int) $data->measures->Searches,
+      )
+    );
+    $query->execute();
+  }
+}

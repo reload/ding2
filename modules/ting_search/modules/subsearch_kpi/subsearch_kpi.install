@@ -1,0 +1,54 @@
+<?php
+/**
+ * @file
+ * Installation of KPI-index sub search module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function subsearch_kpi_schema() {
+
+  $schema['kpi_index_popular_keys'] = array(
+    'fields' => array(
+      'id' => array(
+        'description' => 'The keys MD5',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'popular_keys' => array(
+        'description' => 'The keys',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'numtotalsearches' => array(
+        'description' => 'The number of times the keys was searched',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'unique keys' => array(
+      'id' => array(
+        'id'
+      )
+    ),
+    'primary key' => array(
+      'id'
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function subsearch_kpi_install() {
+  $json = json_decode(file_get_contents(drupal_get_path('module', 'subsearch_kpi') . '/kpi_index.json'));
+  subsearch_kpi_insert_records($json);
+}
