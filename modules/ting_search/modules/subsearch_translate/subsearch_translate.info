@@ -1,0 +1,8 @@
+name = Subsearch Translate search
+description = Extend Ting Search with secondary search
+package = Ding!
+core = 7.x
+version = 0.1
+dependencies[] = ting_search
+dependencies[] = ding_facetbrowser
+dependencies[] = microcurl
