@@ -69,6 +69,9 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   if ($keys || !empty($conditions)) {
     // Collect the search results.
     $results = search_data($keys, $info['module'], $conditions);
+    $search_result = drupal_static('ting_search_results');
+    module_invoke_all('ting_search_results', $keys, $conditions, $search_result);
+
   }
 
   if (!empty($conf['log'])) {
@@ -79,10 +82,14 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   if (!empty($results['#results'])) {
     // Get message limit and raw data well search results.
     $limit = variable_get('ting_search_result_message_limit', 100);
-    $search_result = drupal_static('ting_search_results');
 
     // Set message.
     $message = '';
+    if (is_array(module_invoke_all('ting_search_set_messages'))) {
+      foreach (module_invoke_all('ting_search_set_messages') as $msg) {
+        $message .= $msg;
+      }
+    }
 
     $frequency_rank = array(
       'rank_main_title' => t('Title'),
