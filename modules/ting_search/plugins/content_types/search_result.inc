@@ -64,11 +64,18 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   $block->module = 'search';
   $block->delta = 'result';
 
+  // Set message.
+  $message = '';
+
   $results = '';
   // Only search if there are keywords or non-empty conditions.
   if ($keys || !empty($conditions)) {
     // Collect the search results.
     $results = search_data($keys, $info['module'], $conditions);
+    $search_result = drupal_static('ting_search_results');
+    $messages = module_invoke_all('ting_search_results', $keys, $conditions, $search_result);
+    $message = implode($messages);
+
   }
 
   if (!empty($conf['log'])) {
@@ -79,10 +86,6 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   if (!empty($results['#results'])) {
     // Get message limit and raw data well search results.
     $limit = variable_get('ting_search_result_message_limit', 100);
-    $search_result = drupal_static('ting_search_results');
-
-    // Set message.
-    $message = '';
 
     $frequency_rank = array(
       'rank_main_title' => t('Title'),
@@ -211,4 +214,33 @@ function ting_search_search_result_content_type_admin_title($subtype, $conf, $co
   $info = search_get_info();
   $type = isset($info[$conf['type']]['title']) ? $info[$conf['type']]['title'] : t('Missing/broken type');
   return t('@type search result', array('@type' => $type));
+}
+
+
+/**
+ * Do a secondary search juggling around the drupal static.
+ *
+ * @param string $keys
+ *   The search phrase.
+ *
+ * @return Object TingClientSearchResult
+ *   The search result of the secondary search.
+ */
+function ting_search_do_secondary_search($keys) {
+
+  // Store search result temporarily. We need to make seconday search.
+  $temporary_search_result = drupal_static('ting_search_results');
+
+  // Reset the static containing search result to be able do new search.
+  drupal_static_reset('ting_search_search_execute');
+
+  // Search for the secondary keys.
+  ting_search_search_execute($keys, array('sort' => ''));
+  $secondary_result = drupal_static('ting_search_results');
+
+  // Overwrite the static with the original search.
+  $revert = &drupal_static('ting_search_results');
+  $revert = $temporary_search_result;
+
+  return $secondary_result;
 }
