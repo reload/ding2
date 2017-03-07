@@ -4,6 +4,9 @@
  * Enables search integration with Ting.
  */
 
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ClientException as GuzzleClientException;
+
 // Load Field module hooks.
 module_load_include('inc', 'subsearch_kpi', 'subsearch_kpi.admin');
 
@@ -109,7 +112,7 @@ function subsearch_kpi_cron() {
     return;
   }
 
-  $endpoint = variable_get('subsearch_kpi_webservice_endpoint', NULL);
+  $url = variable_get('subsearch_kpi_webservice_endpoint', NULL);
   $params['start_period'] = variable_get('subsearch_kpi_start_period', NULL);
   $params['end_period'] = variable_get('subsearch_kpi_end_period', NULL);
   $params['format'] = variable_get('subsearch_kpi_format', NULL);
@@ -118,21 +121,30 @@ function subsearch_kpi_cron() {
   $account = variable_get('subsearch_kpi_account', NULL);
   $password = variable_get('subsearch_kpi_password', NULL);
 
-  if (empty($endpoint) || empty($account) || empty($password)) {
+  if (empty($url) || empty($account) || empty($password)) {
     watchdog('subsearch_kpi', 'Module not configured properly', array(), WATCHDOG_WARNING);
     return;
   }
 
-  $options['query'] = $params;
-  $options['maxTime'] = 300;
-  $url = url($endpoint, $options);
-
-  $curl = new MicroCURL();
-  $headers[] = "Accept: application/json";
-  $curl->set_authentication($account, $password);
-  $curl->set_option(CURLOPT_HTTPHEADER, $headers);
-  $result = json_decode($curl->get(array($url)));
-  $curl->close();
+  try {
+    $client = new HttpClient();
+    $response = $client->get(
+      $url,
+      array(
+        'query' => $params,
+        'headers' => array(
+          'Accept' => 'application/json'
+        ),
+        'auth' => [
+          $account,
+          $password
+        ]
+      )
+    );
+    $result = json_decode($response->getBody());
+  } catch (GuzzleClientException $e) {
+    throw new Exception($e->getMessage(), $e->getCode(), $e);
+  }
 
   if (!empty($result)) {
     subsearch_kpi_insert_records($result);
@@ -161,4 +173,48 @@ function subsearch_kpi_insert_records($json) {
     );
     $query->execute();
   }
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function subsearch_kpi_libraries_info() {
+  return array(
+    'guzzle' => array(
+      'name' => 'Guzzle',
+      'vendor url' => 'https://github.com/guzzle/guzzle',
+      'download url' => 'https://github.com/guzzle/guzzle',
+      'version' => '6.2',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+    'promises' => array(
+      'name' => 'Guzzle promises library',
+      'vendor url' => 'https://github.com/guzzle/promises',
+      'download url' => 'https://github.com/guzzle/promises',
+      'version' => '1.2',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+    'http-message' => array(
+      'name' => 'Common interface for HTTP messages',
+      'vendor url' => 'https://github.com/php-fig/http-message',
+      'download url' => 'https://github.com/php-fig/http-message',
+      'version' => '1.0',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+    'psr7' => array(
+      'name' => 'PSR-7 message implementation',
+      'vendor url' => 'https://github.com/guzzle/psr7',
+      'download url' => 'https://github.com/guzzle/psr7',
+      'version' => '1.3',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+  );
 }

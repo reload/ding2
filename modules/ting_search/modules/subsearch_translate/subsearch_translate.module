@@ -5,6 +5,9 @@
  * Translated search.
  */
 
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ClientException as GuzzleClientException;
+
 // Load Field module hooks.
 module_load_include('inc', 'subsearch_translate', 'subsearch_translate.admin');
 
@@ -61,17 +64,67 @@ function subsearch_translate_suggest_translated_keys($keys) {
   $params['source'] = 'da';
   $params['target'] = 'en';
 
-  $options['query'] = $params;
-  $options['maxTime'] = 300;
-  $url = url($url, $options);
-  $curl = new MicroCURL();
-  $headers[] = "Accept: application/json";
-  $curl->set_option(CURLOPT_HTTPHEADER, $headers);
-  $result = json_decode($curl->get(array($url)));
-  //dsm($result);
-  $curl->close();
+  try {
+    $client = new HttpClient();
+    $response = $client->get(
+      $url,
+      array(
+        'query' => $params,
+        'headers' => array(
+          'Accept' => 'application/json'
+        )
+      )
+    );
+    $result = json_decode($response->getBody());
+  } catch (GuzzleClientException $e) {
+    throw new Exception($e->getMessage(), $e->getCode(), $e);
+  }
 
   if (!empty($result->data->translations[0]->translatedText)) {
     return $result->data->translations[0]->translatedText;
   }
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function subsearch_translate_libraries_info() {
+  return array(
+    'guzzle' => array(
+      'name' => 'Guzzle',
+      'vendor url' => 'https://github.com/guzzle/guzzle',
+      'download url' => 'https://github.com/guzzle/guzzle',
+      'version' => '6.2',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+    'promises' => array(
+      'name' => 'Guzzle promises library',
+      'vendor url' => 'https://github.com/guzzle/promises',
+      'download url' => 'https://github.com/guzzle/promises',
+      'version' => '1.2',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+    'http-message' => array(
+      'name' => 'Common interface for HTTP messages',
+      'vendor url' => 'https://github.com/php-fig/http-message',
+      'download url' => 'https://github.com/php-fig/http-message',
+      'version' => '1.0',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+    'psr7' => array(
+      'name' => 'PSR-7 message implementation',
+      'vendor url' => 'https://github.com/guzzle/psr7',
+      'download url' => 'https://github.com/guzzle/psr7',
+      'version' => '1.3',
+      'xautoload' => function ($adapter) {
+        $adapter->composerJson('composer.json');
+      },
+    ),
+  );
 }

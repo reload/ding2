@@ -5,4 +5,4 @@ core = 7.x
 version = 0.1
 dependencies[] = ting_search
 dependencies[] = ding_facetbrowser
-dependencies[] = microcurl
+dependencies[] = xautoload
