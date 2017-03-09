@@ -18,13 +18,13 @@ function subsearch_translate_form_ting_admin_ting_settings_alter(&$form, &$form_
     drupal_set_message(t('Translated search requires !facet. Please insert on !adminpage', array('!facet' => 'facet.genreCategory', '!adminpage' => l('admin/config/ting/facets','admin/config/ting/facets'))), 'warning');
   }
 
-  $form['additional_search']['#type'] = 'fieldset';
-  $form['additional_search']['#title'] = t('Additional Search');
-  $form['additional_search']['#tree'] = FALSE;
+  $form['subsearch_settings']['subsearch_translation']['#type'] = 'fieldset';
+  $form['subsearch_settings']['subsearch_translation']['#title'] = t('Subsearch Translation');
+  $form['subsearch_settings']['subsearch_translation']['#tree'] = FALSE;
 
-  $form['additional_search']['translated_suggestion_google_key'] = array(
+  $form['subsearch_settings']['subsearch_translation']['translated_suggestion_google_key'] = array(
     '#type' => 'textfield',
-    '#title' => t('Translated Search: Google Apikey'),
+    '#title' => t('Google Cloud Translation API key'),
     '#default_value' => variable_get('translated_suggestion_google_key', '')
   );
 }

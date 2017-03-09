@@ -8,45 +8,44 @@
  * Implements hook_form_FORM_ID_alter().
  */
 function subsearch_kpi_form_ting_admin_ting_settings_alter(&$form, &$form_state) {
-  $form['additional_search']['#type'] = 'fieldset';
-  $form['additional_search']['#title'] = t('Ting Subsearch');
-  $form['additional_search']['#description'] = t('Feature modules allow additional searches to be made based on predefined conditions.');
-  $form['additional_search']['#tree'] = FALSE;
+  $form['subsearch_settings']['#type'] = 'fieldset';
+  $form['subsearch_settings']['#title'] = t('Ting Subsearch');
+  $form['subsearch_settings']['#description'] = t('Feature modules allow additional searches to be made based on predefined conditions.');
+  $form['subsearch_settings']['#tree'] = FALSE;
 
-  $form['additional_search']['do_you_mean_case_4_minimum'] = array(
+  $form['subsearch_settings']['subsearch_kpi_trigger_limit'] = array(
     '#type' => 'textfield',
-    '#title' => t('Minimum results for case 4'),
-    '#default_value' => variable_get('do_you_mean_case_4_minimum', 5),
-    '#description' => t('In order to trigger case 4 we need a minimum of results.'),
+    '#title' => t('Number of hits to trigger KPI subsearch'),
+    '#default_value' => variable_get('subsearch_kpi_trigger_limit', 5),
+    '#description' => t('In order to trigger a subsearch which will provide a suggestion to the user, the user-provided search string must trigger at most this number of hits. NOTE: User-provided searches that trigger 0 hits always trigger a subsearch.'),
   );
 
-  if(isset($form['additional_search']['do_you_mean_guess']['#options'])) {
-    $options = $form['additional_search']['do_you_mean_guess']['#options'];
+  if(isset($form['subsearch_settings']['subsearch_service']['#options'])) {
+    $options = $form['subsearch_settings']['subsearch_service']['#options'];
   }
-  $form['additional_search']['do_you_mean_guess'] = array(
+  $form['subsearch_settings']['subsearch_service'] = array(
     '#type' => 'radios',
-    '#title' => t('Guess engine'),
-    '#default_value' => variable_get('do_you_mean_guess', FALSE),
+    '#title' => t('Suggestion service'),
+    '#default_value' => variable_get('subsearch_service', FALSE),
     '#options' => array(),
-    '#description' => t('Choose the guess engine'),
+    '#description' => t('Choose the subsearch service'),
   );
 
   $options['kpi'] = t('KPI Index');
-  $form['additional_search']['do_you_mean_guess']['#options'] = $options;
+  $form['subsearch_settings']['subsearch_service']['#options'] = $options;
 
 
-  $form['additional_search']['do_you_mean_kpi'] = array(
+  $form['subsearch_settings']['kpi_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('KPI settings'),
-    '#states' => array('visible' => array(':input[name="do_you_mean_guess"]' => array('value' => 'kpi'))),
+    '#states' => array('visible' => array(':input[name="subsearch_service"]' => array('value' => 'kpi'))),
   );
 
-  $default_value = 'https://ws.webtrends.com/v3/Reporting/profiles/77577/reports/sprt2Xll7b7/';
-  $form['additional_search']['do_you_mean_kpi']['subsearch_kpi_webservice_endpoint'] = array(
+  $form['subsearch_settings']['kpi_settings']['subsearch_kpi_webservice_endpoint'] = array(
     '#type' => 'textfield',
-    '#title' => t('Webservice Endpoint'),
-    '#default_value' => variable_get('subsearch_kpi_webservice_endpoint', $default_value),
-    '#description' => t('Text to be determined'),
+    '#title' => t('KPI Webtrends On-Site Searches Web Service URL'),
+    '#default_value' => variable_get('subsearch_kpi_webservice_endpoint', ''),
+    '#description' => t('This field must contain the "Web Services" URL to the "On-Site Searches" report that can be found in Webtrends Analytics in the Content category. Click the Share button on the report page to find this URL.'),
   );
   $params = array(
     'start_period' => 'current_day-365',
@@ -55,20 +54,19 @@ function subsearch_kpi_form_ting_admin_ting_settings_alter(&$form, &$form_state)
     'format' => 'json',
   );
   foreach ($params as $key => $value) {
-    $form['additional_search']['do_you_mean_kpi']['subsearch_kpi_' . $key] = array(
+    $form['subsearch_settings']['kpi_settings']['subsearch_kpi_' . $key] = array(
       '#type' => 'textfield',
       '#title' => t('Parameter: !key', array('!key' => $key)),
       '#default_value' => variable_get('subsearch_kpi_' . $key, $value),
-      '#description' => t('Text to be determined'),
     );
   }
-  $form['additional_search']['do_you_mean_kpi']['subsearch_kpi_account'] = array(
+  $form['subsearch_settings']['kpi_settings']['subsearch_kpi_account'] = array(
     '#type' => 'textfield',
     '#title' => t('Account'),
     '#default_value' => variable_get('subsearch_kpi_account', ''),
     '#description' => t('Account\Username.'),
   );
-  $form['additional_search']['do_you_mean_kpi']['subsearch_kpi_password'] = array(
+  $form['subsearch_settings']['kpi_settings']['subsearch_kpi_password'] = array(
     '#type' => 'textfield',
     '#title' => t('Password'),
     '#default_value' => variable_get('subsearch_kpi_password', ''),
@@ -76,16 +74,16 @@ function subsearch_kpi_form_ting_admin_ting_settings_alter(&$form, &$form_state)
     '#description' => t('The password'),
   );
 
-  $form['additional_search']['do_you_mean_kpi']['do_you_mean_kpi_distance'] = array(
+  $form['subsearch_settings']['kpi_settings']['do_you_mean_kpi_distance'] = array(
     '#type' => 'textfield',
     '#title' => t('Levenshtein distance'),
     '#default_value' => variable_get('do_you_mean_kpi_distance', 3),
 
-    '#description' => t('The max allowed distance between words for it to be similar. Higher distance, less similarity.'),
+    '#description' => t('Enter the maximum Levenshtein Distance here, ie. the maximum number of characters to replace, insert or delete to transform the input string into a string from the KPI data. A higher numbere allows for less similar words to be suggested.'),
   );
-  $form['additional_search']['do_you_mean_kpi']['do_you_mean_minimum_searches'] = array(
+  $form['subsearch_settings']['kpi_settings']['do_you_mean_minimum_searches'] = array(
     '#type' => 'textfield',
-    '#title' => t('Minimum of searches for keys'),
+    '#title' => t('Minimum search import limit'),
     '#default_value' => variable_get('do_you_mean_minimum_searches', 1),
     '#description' => t('The KPI Index has a lot of keys with only 1 search. But how few is minimum?'),
   );

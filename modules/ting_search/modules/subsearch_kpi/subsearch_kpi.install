@@ -44,11 +44,3 @@ function subsearch_kpi_schema() {
   );
   return $schema;
 }
-
-/**
- * Implements hook_install().
- */
-function subsearch_kpi_install() {
-  $json = json_decode(file_get_contents(drupal_get_path('module', 'subsearch_kpi') . '/kpi_index.json'));
-  subsearch_kpi_insert_records($json);
-}

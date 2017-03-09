@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Enables search integration with Ting.
+ * Ting subsearch using Open Suggestion service.
  */
 
 use GuzzleHttp\Client as HttpClient;
@@ -17,7 +17,7 @@ function subsearch_opensuggestion_ting_search_results($keys = NULL, $conditions 
 
   $messages = array();
 
-  if (variable_get('do_you_mean_guess', FALSE) != 'os') {
+  if (variable_get('subsearch_service', FALSE) != 'os') {
     return $messages;
   }
 
@@ -56,7 +56,7 @@ function subsearch_opensuggestion_ting_search_results($keys = NULL, $conditions 
     }
   }
 
-  if ($results->numTotalObjects <= variable_get('do_you_mean_case_4_minimum', 5)) {
+  if ($results->numTotalObjects <= variable_get('subsearch_os_trigger_limit', 5)) {
     $suggestion = subsearch_opensuggestion_suggest_keys($keys);
     if ($suggestion) {
       // Do aditional search.
@@ -64,8 +64,6 @@ function subsearch_opensuggestion_ting_search_results($keys = NULL, $conditions 
       if ($suggested_result->numTotalObjects >= 10) {
 
         // Set message!
-
-
         $msg = t('The search for "!keys" returned !num-results hits. Did you mean "<a href="/search/ting/!suggested-keys">!suggested-keys</a>?" which will return !suggested-num-results hits.', array(
           '!suggested-keys' => strtolower($suggestion),
           '!suggested-num-results' => $suggested_result->numTotalObjects,
@@ -135,7 +133,7 @@ function subsearch_opensuggestion_suggest_keys($keys) {
  */
 function subsearch_opensuggestion_libraries_info() {
   return array(
-    'guzzle' => array(
+    'gu zzle' => array(
       'name' => 'Guzzle',
       'vendor url' => 'https://github.com/guzzle/guzzle',
       'download url' => 'https://github.com/guzzle/guzzle',

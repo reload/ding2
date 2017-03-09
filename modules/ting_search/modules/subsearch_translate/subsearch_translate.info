@@ -1,8 +1,8 @@
-name = Subsearch Translate search
-description = Extend Ting Search with secondary search
+name = Ting Subsearch - Translate keyword
+description = Extend Ting Search with secondary search which translates the search to English and informs user if relevant.
 package = Ding!
 core = 7.x
 version = 0.1
+configure = admin/config/ting/settings
 dependencies[] = ting_search
 dependencies[] = ding_facetbrowser
-dependencies[] = xautoload
