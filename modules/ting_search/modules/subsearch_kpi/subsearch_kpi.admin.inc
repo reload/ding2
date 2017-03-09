@@ -13,32 +13,9 @@ function subsearch_kpi_form_ting_admin_ting_settings_alter(&$form, &$form_state)
   $form['subsearch_settings']['#description'] = t('Feature modules allow additional searches to be made based on predefined conditions.');
   $form['subsearch_settings']['#tree'] = FALSE;
 
-  $form['subsearch_settings']['subsearch_kpi_trigger_limit'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Number of hits to trigger KPI subsearch'),
-    '#default_value' => variable_get('subsearch_kpi_trigger_limit', 5),
-    '#description' => t('In order to trigger a subsearch which will provide a suggestion to the user, the user-provided search string must trigger at most this number of hits. NOTE: User-provided searches that trigger 0 hits always trigger a subsearch.'),
-  );
-
-  if(isset($form['subsearch_settings']['subsearch_service']['#options'])) {
-    $options = $form['subsearch_settings']['subsearch_service']['#options'];
-  }
-  $form['subsearch_settings']['subsearch_service'] = array(
-    '#type' => 'radios',
-    '#title' => t('Suggestion service'),
-    '#default_value' => variable_get('subsearch_service', FALSE),
-    '#options' => array(),
-    '#description' => t('Choose the subsearch service'),
-  );
-
-  $options['kpi'] = t('KPI Index');
-  $form['subsearch_settings']['subsearch_service']['#options'] = $options;
-
-
   $form['subsearch_settings']['kpi_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('KPI settings'),
-    '#states' => array('visible' => array(':input[name="subsearch_service"]' => array('value' => 'kpi'))),
   );
 
   $form['subsearch_settings']['kpi_settings']['subsearch_kpi_webservice_endpoint'] = array(
@@ -86,5 +63,19 @@ function subsearch_kpi_form_ting_admin_ting_settings_alter(&$form, &$form_state)
     '#title' => t('Minimum search import limit'),
     '#default_value' => variable_get('do_you_mean_minimum_searches', 1),
     '#description' => t('The KPI Index has a lot of keys with only 1 search. But how few is minimum?'),
+  );
+
+  $form['subsearch_settings']['kpi_settings']['subsearch_kpi_trigger_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Number of hits to trigger KPI subsearch'),
+    '#default_value' => variable_get('subsearch_kpi_trigger_limit', 5),
+    '#description' => t('In order to trigger a subsearch which will provide a suggestion to the user, the user-provided search string must trigger at most this number of hits. NOTE: User-provided searches that trigger 0 hits always trigger a subsearch.'),
+  );
+
+  $form['subsearch_settings']['kpi_settings']['subsearch_kpi_message_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Number of subsearch hits to display message'),
+    '#default_value' => variable_get('subsearch_kpi_message_limit', 10),
+    '#description' => t('Minimum number of hits on secondary search to display suggested search message. Given that the trigger above is hit.'),
   );
 }

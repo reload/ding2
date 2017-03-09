@@ -223,7 +223,7 @@ function ting_search_search_result_content_type_admin_title($subtype, $conf, $co
  * @param string $keys
  *   The search phrase.
  *
- * @return Object TingClientSearchResult
+ * @return TingClientSearchResult
  *   The search result of the secondary search.
  */
 function ting_search_do_secondary_search($keys) {

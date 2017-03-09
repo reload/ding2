@@ -6,3 +6,4 @@ version = 0.1
 configure = admin/config/ting/settings
 dependencies[] = ting_search
 dependencies[] = ding_facetbrowser
+dependencies[] = xautoload
