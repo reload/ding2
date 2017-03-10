@@ -1,4 +1,4 @@
-name = Ting Subsearch - KPI Webtrends suggestions
+name = Ting Subsearch - KPI Webtrends suggestions from imported keys
 description = Extend Ting Search with secondary search
 package = Ding!
 core = 7.x

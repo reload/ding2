@@ -60,7 +60,7 @@ function subsearch_kpi_form_ting_admin_ting_settings_alter(&$form, &$form_state)
     '#type' => 'textfield',
     '#title' => t('Minimum search import limit'),
     '#default_value' => variable_get('do_you_mean_minimum_searches', 1),
-    '#description' => t('The KPI Index has a lot of keys with only 1 search. But how few is minimum?'),
+    '#description' => t('The KPI Webtrends data has search keywords for all searches, including searches with very low frequence (eg. searched only 1 time). Enter the number of minimum searches required before a keyword is imported and used in the KPI subsearch.'),
   );
 
   $form['subsearch_settings']['kpi_settings']['subsearch_kpi_trigger_limit'] = array(

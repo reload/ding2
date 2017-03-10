@@ -14,12 +14,12 @@ function subsearch_opensuggestion_form_ting_admin_ting_settings_alter(&$form, &$
 
   $form['subsearch_settings']['os_settings'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Open Suggest settings'),
+    '#title' => t('Open Suggestion settings'),
   );
 
   $form['subsearch_settings']['os_settings']['subsearch_os_trigger_limit'] = array(
     '#type' => 'textfield',
-    '#title' => t('Number of hits to trigger Open Suggest subsearch'),
+    '#title' => t('Number of hits to trigger Open Suggestion subsearch'),
     '#default_value' => variable_get('subsearch_os_trigger_limit', 5),
     '#description' => t('In order to trigger a subsearch which will provide a suggestion to the user, the user-provided search string must trigger at most this number of hits. NOTE: User-provided searches that trigger 0 hits always trigger a subsearch.'),
   );

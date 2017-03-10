@@ -31,18 +31,18 @@ function subsearch_translate_form_ting_admin_ting_settings_alter(&$form, &$form_
   }
 
   $form['subsearch_settings']['subsearch_translation']['#type'] = 'fieldset';
-  $form['subsearch_settings']['subsearch_translation']['#title'] = t('Subsearch Translation');
+  $form['subsearch_settings']['subsearch_translation']['#title'] = t('Translation Settings');
   $form['subsearch_settings']['subsearch_translation']['#tree'] = FALSE;
 
-  $form['subsearch_settings']['subsearch_translation']['translated_suggestion_google_key'] = array(
+  $form['subsearch_settings']['subsearch_translation']['translation_google_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Google Cloud Translation API key'),
-    '#default_value' => variable_get('translated_suggestion_google_key', ''),
+    '#default_value' => variable_get('translation_google_key', ''),
   );
 
   $form['subsearch_settings']['subsearch_translation']['google_translate_factor'] = array(
     '#type' => 'textfield',
-    '#title' => t('Factor for calculating ration between nonfiction and fiction'),
+    '#title' => t('Factor for calculating ratio between nonfiction and fiction'),
     '#default_value' => variable_get('google_translate_factor', 2),
     '#description' => t('The condition is as following (nonfiction / factor) > fiction'),
   );

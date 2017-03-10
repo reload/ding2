@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Panels render to display search results.
