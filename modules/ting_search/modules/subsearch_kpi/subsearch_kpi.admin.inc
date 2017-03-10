@@ -27,8 +27,6 @@ function subsearch_kpi_form_ting_admin_ting_settings_alter(&$form, &$form_state)
   $params = array(
     'start_period' => 'current_day-365',
     'end_period' => 'current_day-1',
-    'language' => 'en-US',
-    'format' => 'json',
   );
   foreach ($params as $key => $value) {
     $form['subsearch_settings']['kpi_settings']['subsearch_kpi_' . $key] = array(

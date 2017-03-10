@@ -15,7 +15,19 @@ function subsearch_translate_form_ting_admin_ting_settings_alter(&$form, &$form_
   }
 
   if (!in_array('facet.genreCategory', $facets)) {
-    drupal_set_message(t('Translated search requires !facet. Please insert on !adminpage', array('!facet' => 'facet.genreCategory', '!adminpage' => l('admin/config/ting/facets','admin/config/ting/facets'))), 'warning');
+    drupal_set_message(
+      t(
+        'Translated search requires !facet. Please insert on !adminpage',
+        array(
+          '!facet' => 'facet.genreCategory',
+          '!adminpage' => l(
+            t('Configure facets'),
+            'admin/config/ting/facets'
+          ),
+        )
+      ),
+      'warning'
+    );
   }
 
   $form['subsearch_settings']['subsearch_translation']['#type'] = 'fieldset';
@@ -25,6 +37,14 @@ function subsearch_translate_form_ting_admin_ting_settings_alter(&$form, &$form_
   $form['subsearch_settings']['subsearch_translation']['translated_suggestion_google_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Google Cloud Translation API key'),
-    '#default_value' => variable_get('translated_suggestion_google_key', '')
+    '#default_value' => variable_get('translated_suggestion_google_key', ''),
   );
+
+  $form['subsearch_settings']['subsearch_translation']['google_translate_factor'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Factor for calculating ration between nonfiction and fiction'),
+    '#default_value' => variable_get('google_translate_factor', 2),
+    '#description' => t('The condition is as following (nonfiction / factor) > fiction'),
+  );
+
 }

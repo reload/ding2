@@ -27,7 +27,7 @@ function subsearch_kpi_schema() {
         'default' => '',
       ),
       'numtotalsearches' => array(
-        'description' => 'The number of times the keys was searched',
+        'description' => 'The number of times the keys were searched',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -36,11 +36,11 @@ function subsearch_kpi_schema() {
     ),
     'unique keys' => array(
       'id' => array(
-        'id'
-      )
+        'id',
+      ),
     ),
     'primary key' => array(
-      'id'
+      'id',
     ),
   );
   return $schema;

@@ -14,7 +14,7 @@ module_load_include('inc', 'subsearch_kpi', 'subsearch_kpi.admin');
 /**
  * Implements hook_ting_search_results().
  */
-function subsearch_kpi_ting_search_results($keys = NULL, $conditions = NULL, $results) {
+function subsearch_kpi_ting_search_results($keys = NULL, $conditions = NULL, $results = NULL) {
 
   $messages = array();
 
