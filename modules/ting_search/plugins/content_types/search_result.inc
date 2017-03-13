@@ -227,7 +227,7 @@ function ting_search_search_result_content_type_admin_title($subtype, $conf, $co
  * @return TingClientSearchResult
  *   The search result of the secondary search.
  */
-function ting_search_do_secondary_search($keys) {
+function ting_search_do_secondary_search($keys, $options = array()) {
 
   // Store search result temporarily. We need to make seconday search.
   $temporary_search_result = drupal_static('ting_search_results');
@@ -235,13 +235,32 @@ function ting_search_do_secondary_search($keys) {
   // Reset the static containing search result to be able do new search.
   drupal_static_reset('ting_search_search_execute');
 
+  // Load original variables to temporary before changing them.
+  if (!empty($options['profile'])) {
+    $temporary_profile = variable_get('ting_search_profile', '');
+    variable_set('ting_search_profile', $options['profile']);
+  }
+  if (!empty($options['agency'])) {
+    $temporary_agency = variable_get('ting_agency', FALSE);
+    variable_set('ting_agency', $options['agency']);
+  }
+
+
   // Search for the secondary keys.
   ting_search_search_execute($keys, array('sort' => ''));
+
   $secondary_result = drupal_static('ting_search_results');
 
   // Overwrite the static with the original search.
   $revert = &drupal_static('ting_search_results');
   $revert = $temporary_search_result;
+
+  if (!empty($temporary_profile)) {
+    variable_set('ting_search_profile', $temporary_profile);
+  }
+  if (!empty($temporary_agency)) {
+    variable_set('ting_agency', $temporary_agency);
+  }
 
   return $secondary_result;
 }
