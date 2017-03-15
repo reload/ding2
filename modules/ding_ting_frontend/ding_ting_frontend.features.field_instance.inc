@@ -24,6 +24,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 1,
       ),
+      'search_result_list' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 1,
+      ),
       'teaser' => array(
         'label' => 'hidden',
         'module' => 'ding_availability',
@@ -65,6 +71,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'ting_entities_default',
         'weight' => 0,
       ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -101,6 +113,15 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 2,
+      ),
+      'search_result_list' => array(
+        'label' => 'hidden',
+        'module' => 'ting',
+        'settings' => array(
+          'view_mode' => 'search_result_list',
+        ),
+        'type' => 'ting_primary_object_default',
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -165,6 +186,13 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 33,
+      ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'module' => 'ding_availability',
+        'settings' => array(),
+        'type' => 'ding_availability_default',
+        'weight' => 41,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -240,6 +268,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 37,
       ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 9,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -312,6 +346,13 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 35,
+      ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'module' => 'ding_periodical',
+        'settings' => array(),
+        'type' => 'ding_periodical_issues_default',
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -389,6 +430,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'ting_abstract_default',
         'weight' => 18,
+      ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -468,6 +515,13 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'ting_author_default',
         'weight' => 17,
+      ),
+      'search_result_list' => array(
+        'label' => 'hidden',
+        'module' => 'ting',
+        'settings' => array(),
+        'type' => 'ting_author_default',
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -558,6 +612,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'ting_cover_default',
         'weight' => 1,
       ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 42,
+      ),
       'teaser' => array(
         'label' => 'hidden',
         'module' => 'ting_covers',
@@ -637,6 +697,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 34,
       ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -710,6 +776,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 36,
+      ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -787,6 +859,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'ting_series_default',
         'weight' => 19,
       ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'ting',
@@ -863,6 +941,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 2,
+      ),
+      'search_result_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -958,6 +1042,16 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'ting_title_default',
         'weight' => 16,
       ),
+      'search_result_list' => array(
+        'label' => 'hidden',
+        'module' => 'ting',
+        'settings' => array(
+          'link_type' => 'object',
+          'prefix_type' => 'no',
+        ),
+        'type' => 'ting_title_default',
+        'weight' => 1,
+      ),
       'teaser' => array(
         'label' => 'hidden',
         'module' => 'ting',
@@ -1044,6 +1138,12 @@ function ding_ting_frontend_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 5,
+      ),
+      'search_result_list' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
