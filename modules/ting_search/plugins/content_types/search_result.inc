@@ -73,11 +73,17 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   $block->module = 'search';
   $block->delta = 'result';
 
+  // Set message.
+  $message = '';
+
   $results = '';
   // Only search if there are keywords or non-empty conditions.
   if ($keys || !empty($conditions)) {
     // Collect the search results.
     $results = search_data($keys, $info['module'], $conditions);
+    $search_result = drupal_static('ting_search_results');
+    $messages = module_invoke_all('ting_search_results', $keys, $conditions, $search_result);
+    $message = implode($messages);
   }
 
   if (!empty($conf['log'])) {
@@ -90,8 +96,6 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
     $limit = variable_get('ting_search_result_message_limit', 100);
     $search_result = drupal_static('ting_search_results');
 
-    // Set message.
-    $message = '';
     $view_toggle_button = '';
 
     $frequency_rank = array(
