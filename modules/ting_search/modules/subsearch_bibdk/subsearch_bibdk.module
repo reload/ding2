@@ -81,10 +81,96 @@ function subsearch_bibdk_entity_info_alter(&$entity_info) {
   );
 }
 
-function subsearch_bibdk_preprocess_ting_object(&$vars) {
-  if (isset($vars['elements']['#view_mode']) && $vars['elements']['#view_mode'] == 'minimal') {
-    $vars['content']['ting_title'][0]['#prefix'] = '<div>';
-    $vars['content']['ting_title'][0]['#suffix'] = '</div>';
+
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function subsearch_bibdk_field_formatter_info() {
+  return array(
+    'ting_title_minimal' => array(
+      'label' => t('Link to subsearch'),
+      'field types' => array(
+        'ting_title',
+      ),
+      'settings' => array(
+        'link_type' => 'none',
+        'prefix_type' => 'no',
+      ),
+    ),
+
+    'ting_author_minimal' => array(
+      'label' => t('Link to subsearch'),
+      'field types' => array(
+        'ting_author',
+      ),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function subsearch_bibdk_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+
+  foreach ($items as $delta => $item) {
+    switch ($display['type']) {
+      case 'ting_title_minimal':
+        /*
+         * This doesn't work due to the way objects gets cached at the
+         * moment. Until that is fixed, link all objects to collections when
+         * requested, the page will redirect to ting/object/X if there is only
+         * one.
+         */
+        $type = 'ting_object';
+        if ($display['settings']['link_type'] == 'collection') {
+          $type = 'ting_collection';
+        }
+
+        // Only create the link if the object is available in the data well.
+        $title = check_plain($entity->title);
+
+        $element[$delta] = array(
+          '#prefix' => '<h2 class="ting-object-minimal-title">',
+          '#suffix' => '</h2>',
+          '#markup' => $title,
+        );
+
+        break;
+
+      case 'ting_author_minimal':
+        $creators = array();
+        foreach ($entity->creators as $i => $creator) {
+          $creators[] = $creator;
+        }
+        $markup_string = '';
+        if (count($creators)) {
+          if ($entity->date != '') {
+            $markup_string = t('By !author_link (@year)', array(
+              '!author_link' => implode(', ', $creators),
+              // So wrong, but appears to be the way the data is.
+              '@year' => $entity->date,
+            ));
+          }
+          else {
+            $markup_string = t('By !author_link', array(
+              '!author_link' => implode(', ', $creators),
+            ));
+          }
+        }
+        elseif ($entity->date != '') {
+          $markup_string = t('(@year)', array('@year' => $entity->date));
+        }
+        $element[$delta] = array(
+          '#markup' => $markup_string,
+        );
+        break;
+
+    }
   }
 
+  return $element;
 }
