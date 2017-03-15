@@ -1065,6 +1065,13 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'ding_availability_type',
         'weight' => 2,
       ),
+      'minimal' => array(
+        'label' => 'hidden',
+        'module' => 'ting',
+        'settings' => array(),
+        'type' => 'ting_type_default',
+        'weight' => 2,
+      ),
       'search_result' => array(
         'label' => 'hidden',
         'settings' => array(),
