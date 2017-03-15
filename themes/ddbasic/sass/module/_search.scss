@@ -584,7 +584,8 @@ input#edit-search-block-form--2.spinner {
         padding: 15px;
       }
 
-      .view-mode-teaser {
+      .view-mode-teaser,
+      .view-mode-search-result-list {
         padding: 20px;
 
         background-color: transparentize($white, .1);
@@ -703,6 +704,24 @@ input#edit-search-block-form--2.spinner {
       }
     }
   }
+
+  .search-results-view-mode {
+
+    width: 100%;
+    text-align: right;
+    margin: 0;
+    padding-bottom: 20px;
+
+    a:hover {
+      text-decoration: none;
+    }
+
+    a:before {
+      font-family: "FontAwesome";
+      font-size: 200%;
+    }
+  }
+
 }
 
 /* Collection display

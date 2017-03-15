@@ -59,6 +59,15 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
     return;
   }
 
+  // Check if the search should be built with another view mode.
+  $params = drupal_get_query_parameters();
+  if (!empty($params['view'])) {
+    $allowed_modes = array('search_result_list');
+    if (in_array($params['view'], $allowed_modes)) {
+      $conditions['view_mode'] = $params['view'];
+    }
+  }
+
   // Build the content type block.
   $block = new stdClass();
   $block->module = 'search';
@@ -83,6 +92,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
 
     // Set message.
     $message = '';
+    $view_toggle_button = '';
 
     $frequency_rank = array(
       'rank_main_title' => t('Title'),
@@ -103,8 +113,25 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
       $message .= '<div class="messages search-field-in-content--message">' . $msg . '</div>';
     }
 
+    // Display result list view mode toggle button if enabled.
+    if (variable_get('ting_search_result_view_mode_toggle', FALSE)) {
+      // Toggle the 'view' query parameter.
+      if (empty($params['view'])) {
+        $params += array('view' => 'search_result_list');
+        $toggle_class = 'icon-list';
+        $toggle_msg = t('Click to switch to a more compact results list.');
+      } else {
+        unset($params['view']);
+        $toggle_class = 'icon-th-list';
+        $toggle_msg = t('Click to switch to the default results list.');
+      }
+      // Render the toggle button.
+      $view_toggle_link = l('', $_GET['q'], array('attributes' => array('class' => array($toggle_class), 'title' => $toggle_msg), 'html' => 0, 'query' => $params));
+      $view_toggle_button = '<div class="search-results-view-mode">' . $view_toggle_link . '</div>';
+    }
+
     $block->title = t('Search results');
-    $block->content = $message . theme('ting_search_results', array('results' => $results['#results'], 'module' => $conf['type']));;
+    $block->content = $view_toggle_button . $message . theme('ting_search_results', array('results' => $results['#results'], 'module' => $conf['type']));
   }
   else {
     if (empty($conf['override_empty'])) {

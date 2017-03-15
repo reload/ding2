@@ -441,8 +441,14 @@ function ting_search_search_execute($keys = NULL, $conditions = NULL) {
 
         pager_default_initialize($total_results, $results_per_page);
 
+        // Allow the collection to be built with another view mode.
+        $view_mode = 'teaser';
+        if (!empty($conditions['view_mode'])) {
+          $view_mode = $conditions['view_mode'];
+        }
+
         foreach ($search_result->collections as &$collection) {
-          $build = ting_collection_view($collection, 'teaser');
+          $build = ting_collection_view($collection, $view_mode);
           $uri = entity_uri('ting_collection', $collection);
           $results[] = array(
             'link' => url($uri['path'], $uri['options']),
