@@ -146,6 +146,64 @@ function ting_search_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_field_formatter_info().
+ */
+function ting_search_field_formatter_info() {
+  return array(
+    'ting_author_plain' => array(
+      'label' => t('Plain'),
+      'field types' => array(
+        'ting_author',
+      ),
+    ),
+    'ting_version_year' => array(
+      'label' => t('Year'),
+      'field types' => array(
+        'ting_details_version',
+      ),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function ting_search_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  foreach ($items as $delta => $item) {
+    switch ($display['type']) {
+
+      case 'ting_author_plain':
+
+        $markup_string = '';
+        if (count($entity->creators)) {
+          $markup_string = t('!author_link', array(
+            '!author_link' => implode(', ', $entity->creators),
+          ));
+        }
+        $element[$delta] = array(
+          '#markup' => $markup_string,
+        );
+        break;
+
+      case 'ting_version_year':
+
+        $markup_string = '';
+        $element[$delta] = array(
+          '#markup' => $entity->date,
+        );
+        break;
+
+    }
+  }
+
+  return $element;
+}
+
+
+/**
  * Returns a themed list of extended actions.
  *
  * @return string
