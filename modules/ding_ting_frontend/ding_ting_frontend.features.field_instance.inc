@@ -24,11 +24,11 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 1,
       ),
-      'search_result_list' => array(
-        'label' => 'hidden',
+      'result_list' => array(
+        'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -71,11 +71,11 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'ting_entities_default',
         'weight' => 0,
       ),
-      'search_result_list' => array(
+      'result_list' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -123,7 +123,7 @@ function ding_ting_frontend_field_default_field_instances() {
         'type' => 'ting_primary_object_default',
         'weight' => 0,
       ),
-      'search_result_list' => array(
+      'result_list' => array(
         'label' => 'hidden',
         'module' => 'ting',
         'settings' => array(
@@ -198,9 +198,8 @@ function ding_ting_frontend_field_default_field_instances() {
       ),
       'search_result_list' => array(
         'label' => 'above',
-        'module' => 'ding_availability',
         'settings' => array(),
-        'type' => 'ding_availability_default',
+        'type' => 'hidden',
         'weight' => 41,
       ),
       'teaser' => array(
@@ -358,9 +357,8 @@ function ding_ting_frontend_field_default_field_instances() {
       ),
       'search_result_list' => array(
         'label' => 'above',
-        'module' => 'ding_periodical',
         'settings' => array(),
-        'type' => 'ding_periodical_issues_default',
+        'type' => 'hidden',
         'weight' => 14,
       ),
       'teaser' => array(
@@ -534,9 +532,9 @@ function ding_ting_frontend_field_default_field_instances() {
       ),
       'search_result_list' => array(
         'label' => 'hidden',
-        'module' => 'ting',
+        'module' => 'ting_search',
         'settings' => array(),
-        'type' => 'ting_author_default',
+        'type' => 'ting_author_plain',
         'weight' => 0,
       ),
       'teaser' => array(
@@ -1166,7 +1164,7 @@ function ding_ting_frontend_field_default_field_instances() {
         'weight' => 5,
       ),
       'search_result_list' => array(
-        'label' => 'hidden',
+        'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 4,

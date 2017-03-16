@@ -1945,9 +1945,9 @@ function ting_material_details_field_default_field_instances() {
       ),
       'search_result_list' => array(
         'label' => 'hidden',
-        'module' => 'ting_material_details',
+        'module' => 'ting_search',
         'settings' => array(),
-        'type' => 'ting_details_single',
+        'type' => 'ting_version_year',
         'weight' => 8,
       ),
       'teaser' => array(
