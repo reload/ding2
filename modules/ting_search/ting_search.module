@@ -165,7 +165,6 @@ function ting_search_field_formatter_info() {
   );
 }
 
-
 /**
  * Implements hook_field_formatter_view().
  */
@@ -201,7 +200,6 @@ function ting_search_field_formatter_view($entity_type, $entity, $field, $instan
 
   return $element;
 }
-
 
 /**
  * Returns a themed list of extended actions.

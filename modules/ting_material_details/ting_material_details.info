@@ -8,7 +8,6 @@ dependencies[] = ctools
 dependencies[] = features
 dependencies[] = field_group
 dependencies[] = ting
-dependencies[] = ting_material_details
 dependencies[] = ting_search
 dependencies[] = virtual_field
 explanation = Field type(s) in use - see <a href="/admin/reports/fields">Field list</a>
