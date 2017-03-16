@@ -590,6 +590,28 @@ input#edit-search-block-form--2.spinner {
         background-color: transparentize($white, .1);
       }
 
+      .view-mode-result-list {
+        padding: 10px;
+        margin: 0;
+
+        background-color: transparentize($white, .1);
+      }
+
+      .view-mode-search-result-list {
+          width: 100%;
+
+        .field {
+          display: inline-block;
+          width: 18%;
+          float: left;
+          margin-right: 10px;
+
+          h2 {
+            font-size: 105%;
+          }
+        }
+      }
+
       .heading h2 {
         margin-bottom: 10px;
 
@@ -703,6 +725,24 @@ input#edit-search-block-form--2.spinner {
       }
     }
   }
+
+  .search-results-toggle-button {
+
+    width: 100%;
+    text-align: right;
+    margin: 0;
+    padding-bottom: 20px;
+
+    a:hover {
+      text-decoration: none;
+    }
+
+    a:before {
+      font-family: "FontAwesome";
+      font-size: 200%;
+    }
+  }
+
 }
 
 /* Collection display
