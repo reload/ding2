@@ -63,7 +63,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   // Check if the search should be built with another view mode.
   $params = drupal_get_query_parameters();
   if (!empty($params['view'])) {
-    $allowed_modes = array('search_result_list');
+    $allowed_modes = array('result_list');
     if (in_array($params['view'], $allowed_modes)) {
       $conditions['view_mode'] = $params['view'];
     }
@@ -122,7 +122,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
     if (variable_get('ting_search_result_view_mode_toggle', FALSE)) {
       // Toggle the 'view' query parameter.
       if (empty($params['view'])) {
-        $params += array('view' => 'search_result_list');
+        $params += array('view' => 'result_list');
         $toggle_class = 'icon-list';
         $toggle_msg = t('Click to switch to a more compact results list.');
       } else {
