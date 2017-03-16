@@ -18,6 +18,10 @@ function subsearch_kpi_ting_search_results($keys, $conditions, $results) {
 
   $messages = array();
 
+  if (!isset($results->numTotalObjects)) {
+    return $messages;
+  }
+
   // When a zero-hit search is executed and we're able to match "correct"
   // keys, a new search is done with the "correct" keys.
   // Then use the query-parameter original-keys to display what was done to
