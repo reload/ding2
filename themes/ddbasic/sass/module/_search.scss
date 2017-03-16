@@ -584,11 +584,32 @@ input#edit-search-block-form--2.spinner {
         padding: 15px;
       }
 
-      .view-mode-teaser,
-      .view-mode-search-result-list {
+      .view-mode-teaser {
         padding: 20px;
 
         background-color: transparentize($white, .1);
+      }
+
+      .view-mode-result-list {
+        padding: 10px;
+        margin: 0;
+
+        background-color: transparentize($white, .1);
+      }
+
+      .view-mode-search-result-list {
+          width: 100%;
+
+        .field {
+          display: inline-block;
+          width: 18%;
+          float: left;
+          margin-right: 10px;
+
+          h2 {
+            font-size: 105%;
+          }
+        }
       }
 
       .heading h2 {
