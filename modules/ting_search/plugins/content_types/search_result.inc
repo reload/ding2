@@ -132,7 +132,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
       }
       // Render the toggle button.
       $view_toggle_link = l('', $_GET['q'], array('attributes' => array('class' => array($toggle_class), 'title' => $toggle_msg), 'html' => 0, 'query' => $params));
-      $view_toggle_button = '<div class="search-results-view-mode">' . $view_toggle_link . '</div>';
+      $view_toggle_button = '<div class="search-results-toggle-button">' . $view_toggle_link . '</div>';
     }
 
     $block->title = t('Search results');
