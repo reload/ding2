@@ -518,10 +518,10 @@ function ding_ting_frontend_field_default_field_instances() {
       ),
       'minimal' => array(
         'label' => 'hidden',
-        'module' => 'subsearch_bibdk',
+        'module' => 'subsearch_secondary',
         'settings' => array(),
         'type' => 'ting_author_minimal',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -1048,13 +1048,13 @@ function ding_ting_frontend_field_default_field_instances() {
       ),
       'minimal' => array(
         'label' => 'hidden',
-        'module' => 'subsearch_bibdk',
+        'module' => 'subsearch_secondary',
         'settings' => array(
           'link_type' => 'none',
           'prefix_type' => 'no',
         ),
         'type' => 'ting_title_minimal',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -1155,6 +1155,13 @@ function ding_ting_frontend_field_default_field_instances() {
         'module' => 'ding_availability',
         'settings' => array(),
         'type' => 'ding_availability_type',
+        'weight' => 2,
+      ),
+      'minimal' => array(
+        'label' => 'hidden',
+        'module' => 'ting',
+        'settings' => array(),
+        'type' => 'ting_type_default',
         'weight' => 2,
       ),
       'search_result' => array(

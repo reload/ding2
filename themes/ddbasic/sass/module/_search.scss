@@ -1166,3 +1166,18 @@ input#edit-search-block-form--2.spinner {
     }
   }
 }
+
+/**
+ * Theming the minimal view_mode of ting-objects.
+ */
+.ting-object.view-mode-minimal {
+  h2 {
+    font-size: 120%;
+    margin-bottom: 0;
+  }
+  .field-name-ting-author,
+  .field-name-ting-type {
+    display: inline-block;
+  }
+  margin-top: 10px;
+}
