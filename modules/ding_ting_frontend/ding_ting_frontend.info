@@ -90,5 +90,4 @@ features[variable][] = page_manager_search_disabled_node
 features[variable][] = page_manager_user_view_disabled
 features[variable][] = pm_existing_pages_disabled_fulltext
 features[variable][] = pm_existing_pages_disabled_infomedia
-features_exclude[dependencies][subsearch_bibdk] = subsearch_bibdk
-mtime = 1489658965
+mtime = 1477474881
