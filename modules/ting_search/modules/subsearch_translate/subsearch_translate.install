@@ -8,7 +8,7 @@
  * Implements hook_uninstall().
  */
 function subsearch_translate_uninstall() {
-  variable_del('translated_suggestion_google_key');
+  variable_del('translation_google_key');
 }
 
 /**
@@ -20,14 +20,14 @@ function subsearch_translate_requirements($phase) {
   if ($phase == 'runtime') {
     $t = get_t();
     $requirements['google_key'] = array(
-      'title' => $t('Google Apikey'),
-      'value' => $t('In order to translate subsearches, you need to provide a valid Google Apikey'),
+      'title' => $t('Google Cloud Translation API key'),
+      'value' => $t('In order to translate subsearches, you need to provide a valid Google Cloud Translation API key.'),
       'severity' => REQUIREMENT_ERROR,
     );
 
     // Assume that a contains uppercase, lowercase and numbers and is excat
     // 39 characters long.
-    if (preg_match('/^\s*[a-zA-Z0-9]{39}$/', variable_get('translated_suggestion_google_key', ''))) {
+    if (preg_match('/^\s*[a-zA-Z0-9]{39}$/', variable_get('translation_google_key', ''))) {
       $requirements['google_key']['severity'] = REQUIREMENT_OK;
       $requirements['google_key']['value'] = $t('It seems that you provided something similar to a key, its not validated tough');
     }
