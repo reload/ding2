@@ -28,7 +28,7 @@ function subsearch_kpi_ting_search_results($keys, $conditions, $results) {
   // the visitor.
   $parameters = drupal_get_query_parameters();
   if (isset($parameters['original-search'])) {
-    $msg = t('Did you mean "!keys?" which gave !num-results. The search was executed. The search for "!original-keys" returned 0 hits.', array(
+    $msg = t('The search for "!original-keys" returned 0 hits. Showing results for "!keys" instead, which returned !num-results hits.', array(
       '!original-keys' => $parameters['original-search'],
       '!keys' => $keys,
       '!num-results' => $results->numTotalObjects,
