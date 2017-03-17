@@ -42,6 +42,12 @@ function ting_oembed_features_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'search_result_list' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),

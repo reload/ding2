@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Panels render to display search results.
@@ -59,16 +60,32 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
     return;
   }
 
+  // Check if the search should be built with another view mode.
+  $params = drupal_get_query_parameters();
+  if (!empty($params['view'])) {
+    $allowed_modes = array('result_list');
+    if (in_array($params['view'], $allowed_modes)) {
+      $conditions['view_mode'] = $params['view'];
+    }
+  }
+
   // Build the content type block.
   $block = new stdClass();
   $block->module = 'search';
   $block->delta = 'result';
+
+  // Set message.
+  $message = '';
 
   $results = '';
   // Only search if there are keywords or non-empty conditions.
   if ($keys || !empty($conditions)) {
     // Collect the search results.
     $results = search_data($keys, $info['module'], $conditions);
+    $search_result = drupal_static('ting_search_results');
+    $messages = module_invoke_all('ting_search_results', $keys, $conditions, $search_result);
+    $message = implode($messages);
+
   }
 
   if (!empty($conf['log'])) {
@@ -79,10 +96,8 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   if (!empty($results['#results'])) {
     // Get message limit and raw data well search results.
     $limit = variable_get('ting_search_result_message_limit', 100);
-    $search_result = drupal_static('ting_search_results');
 
-    // Set message.
-    $message = '';
+    $view_toggle_button = '';
 
     $frequency_rank = array(
       'rank_main_title' => t('Title'),
@@ -103,8 +118,35 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
       $message .= '<div class="messages search-field-in-content--message">' . $msg . '</div>';
     }
 
+    // Display result list view mode toggle button if enabled.
+    if (variable_get('ting_search_result_view_mode_toggle', FALSE)) {
+      // Toggle the 'view' query parameter.
+      if (empty($params['view'])) {
+        $params += array('view' => 'result_list');
+        $toggle_class = 'icon-list';
+        $toggle_msg = t('Click to switch to a more compact results list.');
+      } else {
+        unset($params['view']);
+        $toggle_class = 'icon-th-list';
+        $toggle_msg = t('Click to switch to the default results list.');
+      }
+      // Render the toggle button.
+      $view_toggle_link = l('', $_GET['q'], array(
+        'attributes' => array(
+          'class' => array($toggle_class),
+          'title' => $toggle_msg,
+        ),
+        'html' => 0,
+        'query' => $params
+      ));
+      $view_toggle_button = '<div class="search-results-toggle-button">' . $view_toggle_link . '</div>';
+    }
+
     $block->title = t('Search results');
-    $block->content = $message . theme('ting_search_results', array('results' => $results['#results'], 'module' => $conf['type']));;
+    $block->content = $view_toggle_button . $message;
+    $block->content .= theme('ting_search_results', array(
+      'results' => $results['#results'], 'module' => $conf['type']
+    ));
   }
   else {
     if (empty($conf['override_empty'])) {
@@ -211,4 +253,51 @@ function ting_search_search_result_content_type_admin_title($subtype, $conf, $co
   $info = search_get_info();
   $type = isset($info[$conf['type']]['title']) ? $info[$conf['type']]['title'] : t('Missing/broken type');
   return t('@type search result', array('@type' => $type));
+}
+
+/**
+ * Do a secondary search juggling around the drupal static.
+ *
+ * @param string $keys
+ *   The search phrase.
+ *
+ * @return TingClientSearchResult
+ *   The search result of the secondary search.
+ */
+function ting_search_do_secondary_search($keys, $options = array()) {
+
+  // Store search result temporarily. We need to make seconday search.
+  $temporary_search_result = drupal_static('ting_search_results');
+
+  // Reset the static containing search result to be able do new search.
+  drupal_static_reset('ting_search_search_execute');
+
+  // Load original variables to temporary before changing them.
+  if (!empty($options['profile'])) {
+    $temporary_profile = variable_get('ting_search_profile', '');
+    variable_set('ting_search_profile', $options['profile']);
+  }
+  if (!empty($options['agency'])) {
+    $temporary_agency = variable_get('ting_agency', FALSE);
+    variable_set('ting_agency', $options['agency']);
+  }
+
+
+  // Search for the secondary keys.
+  ting_search_search_execute($keys, array('sort' => ''));
+
+  $secondary_result = drupal_static('ting_search_results');
+
+  // Overwrite the static with the original search.
+  $revert = &drupal_static('ting_search_results');
+  $revert = $temporary_search_result;
+
+  if (!empty($temporary_profile)) {
+    variable_set('ting_search_profile', $temporary_profile);
+  }
+  if (!empty($temporary_agency)) {
+    variable_set('ting_agency', $temporary_agency);
+  }
+
+  return $secondary_result;
 }
