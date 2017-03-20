@@ -113,7 +113,7 @@ function ting_search_ding_facetbrowser() {
 function ting_search_theme($existing, $type, $theme, $path) {
   return array(
     'ting_search_results' => array(
-      'variables' => array('results' => NULL, 'module' => NULL),
+      'variables' => array('results' => NULL, 'module' => NULL, 'attribs' => array()),
       'file'      => 'ting_search.pages.inc',
       'template'  => 'templates/ting-search-results',
     ),

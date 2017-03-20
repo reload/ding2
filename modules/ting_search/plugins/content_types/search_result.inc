@@ -74,6 +74,9 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   $block->module = 'search';
   $block->delta = 'result';
 
+  $classes = array(
+    'search-results',
+  );
   // Set message.
   $message = '';
   $results = '';
@@ -133,6 +136,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
         $teaser = '<i class="icon-th-list"></i>';
       }
       else {
+        $classes[] = 'search-results-list-results';
         $list = '<i class="icon-list"></i>';
         unset($params['view']);
         $teaser = l('', $_GET['q'], array(
@@ -154,6 +158,10 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
     $block->content = $prefix . theme('ting_search_results', array(
       'results' => $results['#results'],
       'module' => $conf['type'],
+      // Property should be attributes but it's intercepted later on.
+      'attribs' => array(
+        'class' => $classes,
+      ),
     ));
   }
   else {
