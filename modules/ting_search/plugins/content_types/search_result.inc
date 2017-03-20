@@ -76,16 +76,15 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
 
   // Set message.
   $message = '';
-
   $results = '';
+  $prefix = '';
+
   // Only search if there are keywords or non-empty conditions.
   if ($keys || !empty($conditions)) {
     // Collect the search results.
     $results = search_data($keys, $info['module'], $conditions);
     $search_result = drupal_static('ting_search_results');
-    $messages = module_invoke_all('ting_search_results', $keys, $conditions, $search_result);
-    $message = implode($messages);
-
+    $prefix = implode(module_invoke_all('ting_search_results', $keys, $conditions, $search_result));
   }
 
   if (!empty($conf['log'])) {
@@ -142,10 +141,12 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
       $view_toggle_button = '<div class="search-results-toggle-button">' . $view_toggle_link . '</div>';
     }
 
+    $prefix .= $message;
+
     $block->title = t('Search results');
-    $block->content = $view_toggle_button . $message;
-    $block->content .= theme('ting_search_results', array(
-      'results' => $results['#results'], 'module' => $conf['type']
+    $block->content = $prefix . theme('ting_search_results', array(
+      'results' => $results['#results'],
+      'module' => $conf['type'],
     ));
   }
   else {
