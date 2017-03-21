@@ -576,6 +576,48 @@ input#edit-search-block-form--2.spinner {
   padding-top: 20px;
 
   .search-results {
+    &.search-results-list-results {
+
+      .list {
+        padding-left: 0;
+
+        .list-item {
+          background: 0 none;
+          padding: 0;
+          border-bottom: 1px solid $gray-dark;
+          margin: 0;
+        }
+      }
+
+      .ting-object.view-mode-result-list {
+        width: 100%;
+        padding: 0;
+        padding-top: 10px;
+
+        .field {
+          display: inline-block;
+          &.field-name-ting-author,
+          &.field-name-ting-title {
+            width: 25%;
+          }
+          &.field-name-ting-details-type {
+            width: 20%;
+          }
+          &.field-name-ting-details-version,
+          &.field-name-ting-details-classification {
+            width: 10%;
+          }
+          float: left;
+          margin-right: 10px;
+
+          h2 {
+            font-size: 105%;
+            margin-bottom: 0;
+          }
+        }
+      }
+
+    }
     .list {
       padding-left: 0;
 
@@ -595,21 +637,6 @@ input#edit-search-block-form--2.spinner {
         margin: 0;
 
         background-color: transparentize($white, .1);
-      }
-
-      .view-mode-search-result-list {
-          width: 100%;
-
-        .field {
-          display: inline-block;
-          width: 18%;
-          float: left;
-          margin-right: 10px;
-
-          h2 {
-            font-size: 105%;
-          }
-        }
       }
 
       .heading h2 {
@@ -726,20 +753,32 @@ input#edit-search-block-form--2.spinner {
     }
   }
 
-  .search-results-toggle-button {
-
-    width: 100%;
+  .search-results-toggle-buttons {
     text-align: right;
     margin: 0;
+  }
+
+  .search-results-toggle-buttons li {
+
+    display: inline-block;
+    margin-left: 10px;
     padding-bottom: 20px;
-
-    a:hover {
-      text-decoration: none;
+    i {
+      width: auto;
     }
-
-    a:before {
-      font-family: "FontAwesome";
+    i:before {
       font-size: 200%;
+
+    }
+    a {
+      width: auto;
+      &:hover {
+        text-decoration: none;
+      }
+      &:before {
+        font-family: "FontAwesome";
+        font-size: 200%;
+      }
     }
   }
 
