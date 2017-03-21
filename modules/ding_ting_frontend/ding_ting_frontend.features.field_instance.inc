@@ -1008,7 +1008,7 @@ function ding_ting_frontend_field_default_field_instances() {
           'prefix_type' => 'no',
         ),
         'type' => 'ting_title_default',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'hidden',
