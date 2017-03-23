@@ -101,6 +101,40 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
 
     $view_toggle_button = '';
 
+    // When a zero-hit search is executed and we're able to match "correct"
+    // keys, a new search is done with the "correct" keys.
+    // Then use the query-parameter original-keys to display what was done to
+    // the visitor.
+    $parameters = drupal_get_query_parameters();
+    if (isset($parameters['original-search'])) {
+      $msg = t('The search for "!original-keys" returned 0 hits. Did you mean "!keys?" which gave !num-results. The search was executed.', array(
+        '!original-keys' => $parameters['original-search'],
+        '!keys' => $keys,
+        '!num-results' => $search_result->numTotalObjects,
+      ));
+      $message .= '<div class="messages warning">' . $msg . '</div>';
+    }
+
+    // If the search had five or less results and we can match "correct" keys
+    // We will display that there maybe is better keys to find what the visitor
+    // is looking for.
+    if ($search_result->numTotalObjects <= 5) {
+      $suggestion = search_zerohit_suggest($keys);
+      if ($suggestion) {
+        // Do aditional search.
+        $suggested_result = search_do_secondary_search($suggestion);
+        if ($suggested_result->numTotalObjects >= 10) {
+          $msg = t('The search for "!keys" returned !num-results hits. Did you mean "<a href="/search/ting/!suggested-keys">!suggested-keys</a>?" which will return !suggested-num-results hits.', array(
+            '!suggested-keys' => strtolower($suggestion),
+            '!suggested-num-results' => $suggested_result->numTotalObjects,
+            '!keys' => $keys,
+            '!num-results' => $search_result->numTotalObjects,
+          ));
+          $message .= '<div class="messages warning">' . $msg . '</div>';
+        }
+      }
+    }
+
     $frequency_rank = array(
       'rank_main_title' => t('Title'),
       'rank_title' => t('Title'),
@@ -112,7 +146,6 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
       $msg = t('Records are sorted by %sortUsed . Select another sort if it is not suited', array('%sortUsed' => $frequency_rank[$search_result->sortUsed]));
       $message .= '<div class="messages status">' . $msg . '</div>';
     }
-
 
     if (isset($search_result) && $limit < $search_result->numTotalObjects) {
       $msg = t('Your search gave more than %s results. Try to search more specific or use the facets to filter the result.');
@@ -165,6 +198,23 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
     ));
   }
   else {
+    // The search result returned zero-hits so we need to see if "correct" keys
+    // can yield a better result.
+    $search_result = drupal_static('ting_search_results');
+    // Find suggestions for "correct" search phrase.
+    $suggestion = search_zerohit_suggest($keys);
+
+    if (!empty($suggestion)) {
+      // Do secondary search for "correct" keys.
+      $secondary_result = search_do_secondary_search($suggestion);
+      // Only redirect to "correct" keys search if it has a positive result.
+      if ($secondary_result->numTotalObjects > 0) {
+        $params['query'] = array(
+          'original-search' => $search_result->search_key
+        );
+        drupal_goto('search/ting/' . strtolower($suggestion), $params);
+      }
+    }
     if (empty($conf['override_empty'])) {
       $block->title = t('Your search yielded no results');
       $block->content = search_help('search#noresults', drupal_help_arg());
@@ -178,6 +228,69 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
   return $block;
 }
 
+/**
+ * Do a secondary search juggling around the drupal static.
+ *
+ * @param string $keys
+ *   The search phrase.
+ *
+ * @return Object TingClientSearchResult
+ *   The search result of the secondary search.
+ */
+function search_do_secondary_search($keys) {
+
+  // Store search result temporarily. We need to make seconday search.
+  $temporary_search_result = drupal_static('ting_search_results');
+
+  // Reset the static containing search result to be able do new search.
+  drupal_static_reset('ting_search_search_execute');
+
+  // Search for the secondary keys.
+  ting_search_search_execute($keys, array('sort' => ''));
+  $secondary_result = drupal_static('ting_search_results');
+
+  // Overwrite the static with the original search.
+  $revert = &drupal_static('ting_search_results');
+  $revert = $temporary_search_result;
+
+  return $secondary_result;
+}
+
+/**
+ * Find the first suggestion for given keys.
+ *
+ * @param string $keys
+ *   The original keys that you want to find suggestion for.
+ *
+ * @return string
+ *   The suggestion.
+ */
+function search_zerohit_suggest($keys) {
+
+  $settings = ting_search_autocomplete_settings();
+  $url = variable_get('ting_search_autocomplete_suggestion_url', '') . 'rest/facetSpell';
+
+  $options['query'] = array('query' => check_plain($keys)) + $settings;
+  $options['maxTime'] = 300;
+  $url = url($url, $options);
+  $curl = new MicroCURL();
+  $headers[] = "Accept: application/json";
+  $curl->set_option(CURLOPT_HTTPHEADER, $headers);
+  $result = json_decode($curl->get(array($url)));
+  $curl->close();
+
+  $items = array();
+  // First child of $result changes name from suggestions to suggestion when
+  // switching between version 3.0 and 3.5
+  if (!empty(current($result))) {
+    foreach (current($result) as $suggestion) {
+      return $suggestion->phrase;
+    }
+  }
+  if (empty($items)) {
+    return FALSE;
+  }
+}
 /**
  * Returns an edit form for custom type settings.
  */
