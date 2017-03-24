@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Translated search.
+ */
+
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ClientException as GuzzleClientException;
+
+// Load Field module hooks.
+module_load_include('inc', 'ting_subsearch_translate', 'ting_subsearch_translate.admin');
+
+/**
+ * Implements hook_ting_search_results().
+ */
+function ting_subsearch_translate_ting_search_results($keys, $conditions, $results) {
+
+  $messages = array();
+
+  if (!isset($results->numTotalObjects)) {
+    return $messages;
+  }
+
+  // If no google api key is set we cannot translate.
+  if (empty(variable_get('ting_subsearch_translate_google_key', ''))) {
+    return $messages;
+  }
+
+  // If any of fiction or non fiction is empty we cannot do the calculation.
+  // Simply exit for now.
+  if (empty($results->facets['facet.genreCategory']->terms['nonfiktion'])
+  || empty($results->facets['facet.genreCategory']->terms['fiktion'])) {
+    watchdog('subsearch_translate', 'You need to enable facet.genreCategory in order for this to work.', array(), WATCHDOG_WARNING);
+    return $messages;
+  }
+  $nonfiction = $results->facets['facet.genreCategory']->terms['nonfiktion'];
+  $fiction = $results->facets['facet.genreCategory']->terms['fiktion'];
+
+  // Less than half fiction of nonfiction.
+  if (($nonfiction / variable_get('ting_subsearch_translate_factor', 2)) > $fiction) {
+
+    // Do translation.
+    $translated_keys = ting_subsearch_translate_suggest_translated_keys($keys);
+    $suggested_result = ting_subsearch_common_do_secondary_search($translated_keys);
+
+    if ($suggested_result->numTotalObjects > $results->numTotalObjects) {
+      $suggestion = $translated_keys;
+      $msg = t('The search for "!keys" gave !num-results hits. If you search for the English translation "<a href="/search/ting/!suggested-keys">!suggested-keys</a>" you will get !suggested-num-results hits.', array(
+        '!suggested-keys' => strtolower($suggestion),
+        '!suggested-num-results' => $suggested_result->numTotalObjects,
+        '!keys' => $keys,
+        '!num-results' => $results->numTotalObjects,
+      ));
+      $messages[] = '<div class="messages warning">' . $msg . '</div>';
+    }
+
+  }
+  return $messages;
+}
+
+/**
+ * Finds suggested keys based on Google translation.
+ */
+function ting_subsearch_translate_suggest_translated_keys($keys) {
+
+  $url = 'https://www.googleapis.com/language/translate/v2';
+
+  $params = [];
+  $params['q'] = $keys;
+  $params['key'] = variable_get('ting_subsearch_translate_google_key', '');
+  $params['source'] = 'da';
+  $params['target'] = 'en';
+
+  try {
+    $client = new HttpClient();
+    $response = $client->get(
+      $url,
+      array(
+        'query' => $params,
+        'headers' => array(
+          'Accept' => 'application/json',
+        ),
+      )
+    );
+    $result = json_decode($response->getBody());
+  }
+  catch (GuzzleClientException $e) {
+    throw new Exception($e->getMessage(), $e->getCode(), $e);
+  }
+
+  if (!empty($result->data->translations[0]->translatedText)) {
+    return $result->data->translations[0]->translatedText;
+  }
+}
