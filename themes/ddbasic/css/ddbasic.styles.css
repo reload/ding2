@@ -5107,6 +5107,30 @@ input#edit-search-block-form--2.spinner {
   clear: both;
   overflow: hidden;
   padding-top: 20px; }
+  .pane-search-result .search-results.search-results-list-results .list, .view-node-search-result .search-results.search-results-list-results .list, .ting-reference-reverse-list .search-results.search-results-list-results .list {
+    padding-left: 0; }
+    .pane-search-result .search-results.search-results-list-results .list .list-item, .view-node-search-result .search-results.search-results-list-results .list .list-item, .ting-reference-reverse-list .search-results.search-results-list-results .list .list-item {
+      background: 0 none;
+      padding: 0;
+      border-bottom: 1px solid #bcbcbc;
+      margin: 0; }
+  .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list {
+    width: 100%;
+    padding: 0;
+    padding-top: 10px; }
+    .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list .field {
+      display: inline-block;
+      float: left;
+      margin-right: 10px; }
+      .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-author, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-author, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-author, .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-title, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-title, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-title {
+        width: 25%; }
+      .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-type, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-type, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-type {
+        width: 20%; }
+      .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-version, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-version, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-version, .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-classification, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-classification, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list .field.field-name-ting-details-classification {
+        width: 10%; }
+      .pane-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field h2, .view-node-search-result .search-results.search-results-list-results .ting-object.view-mode-result-list .field h2, .ting-reference-reverse-list .search-results.search-results-list-results .ting-object.view-mode-result-list .field h2 {
+        font-size: 105%;
+        margin-bottom: 0; }
   .pane-search-result .search-results .list, .view-node-search-result .search-results .list, .ting-reference-reverse-list .search-results .list {
     padding-left: 0;
     /* Compact search result display */ }
@@ -5115,6 +5139,10 @@ input#edit-search-block-form--2.spinner {
       padding: 15px; }
     .pane-search-result .search-results .list .view-mode-teaser, .view-node-search-result .search-results .list .view-mode-teaser, .ting-reference-reverse-list .search-results .list .view-mode-teaser {
       padding: 20px;
+      background-color: rgba(255, 255, 255, 0.9); }
+    .pane-search-result .search-results .list .view-mode-result-list, .view-node-search-result .search-results .list .view-mode-result-list, .ting-reference-reverse-list .search-results .list .view-mode-result-list {
+      padding: 10px;
+      margin: 0;
       background-color: rgba(255, 255, 255, 0.9); }
     .pane-search-result .search-results .list .heading h2, .view-node-search-result .search-results .list .heading h2, .ting-reference-reverse-list .search-results .list .heading h2 {
       margin-bottom: 10px;
@@ -5177,6 +5205,24 @@ input#edit-search-block-form--2.spinner {
   @media only screen and (max-width: 480px) {
     .pane-search-result .search-results .list .heading, .view-node-search-result .search-results .list .heading, .ting-reference-reverse-list .search-results .list .heading {
       font-size: 75%; } }
+  .pane-search-result .search-results-toggle-buttons, .view-node-search-result .search-results-toggle-buttons, .ting-reference-reverse-list .search-results-toggle-buttons {
+    text-align: right;
+    margin: 0; }
+  .pane-search-result .search-results-toggle-buttons li, .view-node-search-result .search-results-toggle-buttons li, .ting-reference-reverse-list .search-results-toggle-buttons li {
+    display: inline-block;
+    margin-left: 10px;
+    padding-bottom: 20px; }
+    .pane-search-result .search-results-toggle-buttons li i, .view-node-search-result .search-results-toggle-buttons li i, .ting-reference-reverse-list .search-results-toggle-buttons li i {
+      width: auto; }
+    .pane-search-result .search-results-toggle-buttons li i:before, .view-node-search-result .search-results-toggle-buttons li i:before, .ting-reference-reverse-list .search-results-toggle-buttons li i:before {
+      font-size: 200%; }
+    .pane-search-result .search-results-toggle-buttons li a, .view-node-search-result .search-results-toggle-buttons li a, .ting-reference-reverse-list .search-results-toggle-buttons li a {
+      width: auto; }
+      .pane-search-result .search-results-toggle-buttons li a:hover, .view-node-search-result .search-results-toggle-buttons li a:hover, .ting-reference-reverse-list .search-results-toggle-buttons li a:hover {
+        text-decoration: none; }
+      .pane-search-result .search-results-toggle-buttons li a:before, .view-node-search-result .search-results-toggle-buttons li a:before, .ting-reference-reverse-list .search-results-toggle-buttons li a:before {
+        font-family: "FontAwesome";
+        font-size: 200%; }
 
 /* Collection display
    ========================================================================== */
@@ -5456,6 +5502,18 @@ input#edit-search-block-form--2.spinner {
       margin-left: 0; }
     #autocomplete li a:hover {
       background-color: #efefef; }
+
+/**
+ * Theming the minimal view_mode of ting-objects.
+ */
+.ting-object.view-mode-minimal {
+  margin-top: 10px; }
+  .ting-object.view-mode-minimal h2 {
+    font-size: 120%;
+    margin-bottom: 0; }
+  .ting-object.view-mode-minimal .field-name-ting-author,
+  .ting-object.view-mode-minimal .field-name-ting-type {
+    display: inline-block; }
 
 /**
  * Carousel
