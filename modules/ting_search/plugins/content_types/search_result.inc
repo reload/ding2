@@ -123,19 +123,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
     // Display result list view mode toggle button if enabled.
     if (variable_get('ting_search_result_view_mode_toggle', FALSE)) {
 
-      if (empty($conditions['view_mode'])) {
-        $params += array('view' => 'result_list');
-        $list = l('', $_GET['q'], array(
-          'attributes' => array(
-            'class' => array('icon-list'),
-            'title' => t('Click to switch to a more compact results list.'),
-          ),
-          'html' => 0,
-          'query' => $params,
-        ));
-        $teaser = '<i class="icon-th-list"></i>';
-      }
-      else {
+      if (!empty($conditions['view_mode'])) {
         $classes[] = 'search-results-list-results';
         $list = '<i class="icon-list"></i>';
         unset($params['view']);
@@ -147,6 +135,18 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
           'html' => 0,
           'query' => $params,
         ));
+      }
+      else {
+        $params += array('view' => 'result_list');
+        $list = l('', $_GET['q'], array(
+          'attributes' => array(
+            'class' => array('icon-list'),
+            'title' => t('Click to switch to a more compact results list.'),
+          ),
+          'html' => 0,
+          'query' => $params,
+        ));
+        $teaser = '<i class="icon-th-list"></i>';
       }
       // Put toggle first in prefix.
       $prefix = theme(
