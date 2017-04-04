@@ -127,7 +127,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
         $classes[] = 'search-results-list-results';
         $list = '<i class="icon-list"></i>';
         unset($params['view']);
-        $teaser = l('', $_GET['q'], array(
+        $teaser = l(NULL, $_GET['q'], array(
           'attributes' => array(
             'class' => array('icon-th-list'),
             'title' => t('Click to switch to the default results list.'),
@@ -138,7 +138,7 @@ function ting_search_search_result_content_type_render($subtype, $conf, $panel_a
       }
       else {
         $params += array('view' => 'result_list');
-        $list = l('', $_GET['q'], array(
+        $list = l(NULL, $_GET['q'], array(
           'attributes' => array(
             'class' => array('icon-list'),
             'title' => t('Click to switch to a more compact results list.'),
