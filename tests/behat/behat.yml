@@ -37,7 +37,6 @@ chrome:
   extensions:
     Behat\MinkExtension:
       selenium2:
-        wd_host: "http://localhost:4444/wd/hub"
         browser: chrome
         capabilities:
            browser: chrome
@@ -51,7 +50,6 @@ circleci:
   extensions:
     Behat\MinkExtension:
       selenium2:
-        wd_host: "http://localhost:4444/wd/hub"
         browser: chrome
         capabilities:
            browser: chrome
@@ -66,7 +64,6 @@ visible:
   extensions:
     Behat\MinkExtension:
       selenium2:
-         wd_host: "http://localhost:4445/wd/hub"
          browser: chrome
          capabilities:
            browser: chrome
@@ -81,6 +78,5 @@ firefox:
     Behat\MinkExtension:
       selenium2:
         browser: 'firefox'
-        wd_host: "http://localhost:4444/wd/hub"
       default_session: 'selenium2'
       browser_name: 'firefox'

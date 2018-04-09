@@ -42,7 +42,7 @@ circle-run-behat-tests:
 	# Make the files directory writable for the web server user.
 	cd $(DRUPAL_SITE_PATH)/sites/default && sudo chown www-data. files
 	# Run Behat tests.
-	export BEHAT_PARAMS='{"extensions" : {"Behat\\MinkExtension" : {"base_url" : "http://ding2.dev/" }}}' && \
+	export BEHAT_PARAMS='{"extensions" : {"Behat\\MinkExtension" : {"base_url" : "http://ding2.dev/", "selenium2" : { "wd_host" : "http://localhost:4444/wd/hub" } } } }' && \
 	cd $(DRUPAL_SITE_PATH)/profiles/ding2/tests/behat && \
 	echo "ScrShotDir	$(CIRCLE_ARTIFACTS)/" > behat.config && \
 	./bin/behat --tags 'cci' --tags '~wip' --format=junit --out=$(CIRCLE_TEST_REPORTS)/cucumber/junit.xml --format=pretty --out=std -p chrome
