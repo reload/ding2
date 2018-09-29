@@ -8,7 +8,7 @@
         "bin-dir": "bin/"
     },
     "require": {
-        "behat/behat": "^3.4",
+        "behat/behat": "^3.5",
         "behat/mink": "^1.4@stable",
         "behat/mink-extension": "^2.2",
         "behat/mink-goutte-driver": "^1.2",
