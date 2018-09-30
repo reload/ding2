@@ -70,10 +70,10 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        name: Configure PHP for Drupal
+        name: Configure PHP for Ding2
         command: |
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
-          echo "sendmail_path = /bin/true" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-ding2.ini
+          echo "sendmail_path = /bin/true" >> /usr/local/etc/php/conf.d/docker-php-ding2.ini
           php -i
     - run:
         name: Install Drush 6.x
@@ -116,10 +116,10 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        name: Configure PHP for Drupal
+        name: Configure PHP for Ding2
         command: |
           sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-ding2.ini
           php -i
     - run:
         name: Install Drush 6.x
@@ -161,10 +161,10 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        name: Configure PHP for Drupal
+        name: Configure PHP for Ding2
         command: |
           sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-ding2.ini
     - run:
         name: Install Drush 6.x
         command: |
