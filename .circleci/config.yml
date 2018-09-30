@@ -63,7 +63,7 @@ jobs:
 
   site_install:
     docker:
-    - image: circleci/php:7.0-cli
+    - image: drupalci/php-7.0-apache:production
     - image: circleci/mariadb:latest-ram
     working_directory: ~/drupal
     steps:
@@ -72,15 +72,13 @@ jobs:
     - run:
         name: Configure PHP for Drupal
         command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
-          sudo chmod 0777 /usr/local/etc/php/conf.d
           echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
           echo "sendmail_path = /bin/true" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
           php -i
     - run:
-        name: Install Drush
+        name: Install Drush 6.x
         command: |
+          rm /usr/local/bin/drush
           echo 'export PATH=~/.composer/vendor/bin:$PATH'  >> $BASH_ENV
           source $BASH_ENV
           composer global require drush/drush:6.* --prefer-source --no-interaction
@@ -111,7 +109,7 @@ jobs:
 
   unit_tests:
     docker:
-    - image: circleci/php:7.0-cli
+    - image: drupalci/php-7.0-apache:production
     - image: circleci/mariadb:latest-ram
     working_directory: ~/drupal
     steps:
@@ -120,14 +118,13 @@ jobs:
     - run:
         name: Configure PHP for Drupal
         command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
           sudo chmod 0777 /usr/local/etc/php/conf.d
           echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
           php -i
     - run:
-        name: Install Drush
+        name: Install Drush 6.x
         command: |
+          rm /usr/local/bin/drush
           echo 'export PATH=~/.composer/vendor/bin:$PATH'  >> $BASH_ENV
           source $BASH_ENV
           composer global require drush/drush:6.* --prefer-source --no-interaction
@@ -155,7 +152,7 @@ jobs:
 
   behat_tests:
     docker:
-    - image: circleci/php:7.0-apache
+    - image: drupalci/php-7.0-apache:production
     - image: circleci/mariadb:latest-ram
     - image: justinribeiro/chrome-headless:stable
     working_directory: ~/drupal
@@ -166,21 +163,12 @@ jobs:
     - run:
         name: Configure PHP for Drupal
         command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
           sudo chmod 0777 /usr/local/etc/php/conf.d
           echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
     - run:
-        name: Configure Apache
+        name: Install Drush 6.x
         command: |
-          sudo rm -rf /var/www/html
-          sudo ln -s ~/drupal /var/www/html
-          sudo chmod -R 0777 /var/www/html/sites/default
-          sudo a2enmod rewrite
-          sudo service apache2 restart
-    - run:
-        name: Install Drush
-        command: |
+          rm /usr/local/bin/drush
           echo 'export PATH=~/.composer/vendor/bin:$PATH'  >> $BASH_ENV
           source $BASH_ENV
           composer global require drush/drush:6.* --prefer-source --no-interaction
@@ -217,7 +205,7 @@ jobs:
           mkdir -p ~/tests/behat/screenshots
           echo "ScrShotDir	/home/circleci/tests/behat/screenshots/" > behat.config
           export BEHAT_PARAMS='{"extensions" : {"Behat\\MinkExtension" : {"base_url" : "http://localhost/" }}}'
-          ./bin/behat -p chrome --tags 'cci' --tags '~wip'  --list-scenarios \
+          ./bin/behat -p chrome --tags 'cci' --tags '~wip' --list-scenarios \
             | circleci tests split --split-by=timings --timings-type=testname \
             | xargs -n 1 -I % ./bin/behat --format=junit --out=/home/circleci/tests/behat/% --format=pretty --out=std -p chrome %
         working_directory: ~/drupal/profiles/ding2/tests/behat
