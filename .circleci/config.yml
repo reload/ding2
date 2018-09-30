@@ -98,7 +98,7 @@ jobs:
         name: Dump database for installed site
         command: |
           mkdir ~/db
-          drush sql-dump --result-file=~/db/db.sql
+          drush sql-dump --result-file=$HOME/db/db.sql
     - persist_to_workspace:
         root: ~/
         paths:
@@ -130,7 +130,7 @@ jobs:
           composer global require drush/drush:6.* --prefer-source --no-interaction
     - run:
         name: Import database
-        command: drush sqlq --file=/home/circleci/db/db.sql
+        command: drush sqlq --file=$HOME/db/db.sql
     - run:
         name: Install unit test dependencies
         command: composer install
@@ -174,7 +174,7 @@ jobs:
           composer global require drush/drush:6.* --prefer-source --no-interaction
     - run:
         name: Import database
-        command: drush sqlq --file=/home/circleci/db/db.sql
+        command: drush sqlq --file=$HOME/db/db.sql
     - run:
         name: Configure site for Behat tests
         command: |
@@ -203,11 +203,11 @@ jobs:
         name: Run Behat tests
         command: |
           mkdir -p ~/tests/behat/screenshots
-          echo "ScrShotDir	/home/circleci/tests/behat/screenshots/" > behat.config
+          echo "ScrShotDir	$HOME/tests/behat/screenshots/" > behat.config
           export BEHAT_PARAMS='{"extensions" : {"Behat\\MinkExtension" : {"base_url" : "http://localhost/" }}}'
           ./bin/behat -p chrome --tags 'cci' --tags '~wip' --list-scenarios \
             | circleci tests split --split-by=timings --timings-type=testname \
-            | xargs -n 1 -I % ./bin/behat --format=junit --out=/home/circleci/tests/behat/% --format=pretty --out=std -p chrome %
+            | xargs -n 1 -I % ./bin/behat --format=junit --out=$HOME/tests/behat/% --format=pretty --out=std -p chrome %
         working_directory: ~/drupal/profiles/ding2/tests/behat
     - store_test_results:
         path: ~/tests/behat
