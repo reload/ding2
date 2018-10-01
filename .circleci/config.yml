@@ -69,9 +69,9 @@ jobs:
     steps:
     - attach_workspace:
         at: ~/
-    - run:
+    - run: &php-drupal
         name: Configure PHP for Drupal
-        command: &php-drupal |
+        command: |
           sudo apt install -y libpng-dev mysql-client
           sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
