@@ -71,7 +71,7 @@ jobs:
         at: ~/
     - run:
         name: Configure PHP for Drupal
-        command: |
+        command: &php-drupal |
           sudo apt install -y libpng-dev mysql-client
           sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
@@ -118,13 +118,7 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        name: Configure PHP for Drupal
-        command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql opcache
-          sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
-          php -i
+        <<: *php-drupal
     - run:
         name: Install Drush
         command: |
@@ -164,12 +158,7 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        name: Configure PHP for Drupal
-        command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql opcache
-          sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+        <<: *php-drupal
     - run:
         name: Configure Apache
         command: |
