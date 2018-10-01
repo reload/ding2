@@ -73,7 +73,7 @@ jobs:
         name: Configure PHP for Drupal
         command: |
           sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
+          sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
           echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
           echo "sendmail_path = /bin/true" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
@@ -121,7 +121,7 @@ jobs:
         name: Configure PHP for Drupal
         command: |
           sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
+          sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
           echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
           php -i
@@ -167,7 +167,7 @@ jobs:
         name: Configure PHP for Drupal
         command: |
           sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
+          sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
           echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
     - run:
