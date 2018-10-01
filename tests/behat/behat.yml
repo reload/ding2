@@ -29,6 +29,9 @@ default:
         username_field: 'Låner- eller CPR-nummer'
         password_field: 'Pinkode'
     Liuggio\Fastest\Behat\ListFeaturesExtension\Extension: ~
+    Lakion\Behat\MinkDebugExtension:
+      directory: /root/tests/behat
+      clean_start: false
 
 
 chrome:

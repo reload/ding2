@@ -18,7 +18,8 @@
         "paragonie/random_compat": "^2.0",
         "liuggio/fastest": "^1.6",
         "dmore/behat-chrome-extension": "^1.2",
-        "cweagans/composer-patches": "^1.6"
+        "cweagans/composer-patches": "^1.6",
+        "lakion/mink-debug-extension": "^1.2"
     },
     "extra": {
         "patches": {
