@@ -75,17 +75,15 @@ jobs:
           sudo apt install -y libpng-dev mysql-client
           sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo -e "\n\
-          memory_limit = 512M\n\
-          opcache.enable=1\n\
-          opcache.enable_cli=1\n\
-          opcache.memory_consumption=1000\n\
-          opcache.interned_strings_buffer=4\n\
-          opcache.max_accelerated_files=100000\n\
-          opcache.max_wasted_percentage=5\n\
-          opcache.revalidate_freq=0\n\
-          sendmail_path = /bin/true\n\
-          >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "opcache.enable_cli=1" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "opcache.memory_consumption=1000" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "opcache.interned_strings_buffer=4" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "opcache.max_accelerated_files=100000" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "opcache.max_wasted_percentage=5" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "opcache.revalidate_freq=0" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          echo "sendmail_path = /bin/true" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
           php -i
     - run:
         name: Install Drush
