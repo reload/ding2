@@ -73,10 +73,19 @@ jobs:
         name: Configure PHP for Drupal
         command: |
           sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
+          sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
-          echo "sendmail_path = /bin/true" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          tee /usr/local/etc/php/conf.d/docker-php-drupal.ini << EOF
+          memory_limit = 512M
+          sendmail_path = /bin/true
+          opcache.enable=1
+          opcache.enable_cli=1
+          opcache.memory_consumption=1000
+          opcache.interned_strings_buffer=4
+          opcache.max_accelerated_files=100000
+          opcache.max_wasted_percentage=5
+          opcache.validate_timestamps=0
+          EOF
           rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
           php -i
     - run:
@@ -122,9 +131,19 @@ jobs:
         name: Configure PHP for Drupal
         command: |
           sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
+          sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          tee /usr/local/etc/php/conf.d/docker-php-drupal.ini << EOF
+          memory_limit = 512M
+          sendmail_path = /bin/true
+          opcache.enable=1
+          opcache.enable_cli=1
+          opcache.memory_consumption=1000
+          opcache.interned_strings_buffer=4
+          opcache.max_accelerated_files=100000
+          opcache.max_wasted_percentage=5
+          opcache.validate_timestamps=0
+          EOF
           rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
           php -i
     - run:
@@ -169,9 +188,19 @@ jobs:
         name: Configure PHP for Drupal
         command: |
           sudo apt install -y libpng-dev mysql-client
-          sudo docker-php-ext-install gd pdo_mysql
+          sudo docker-php-ext-install gd pdo_mysql opcache
           sudo chmod 0777 /usr/local/etc/php/conf.d
-          echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-drupal.ini
+          tee /usr/local/etc/php/conf.d/docker-php-drupal.ini << EOF
+          memory_limit = 512M
+          sendmail_path = /bin/true
+          opcache.enable=1
+          opcache.enable_cli=1
+          opcache.memory_consumption=1000
+          opcache.interned_strings_buffer=4
+          opcache.max_accelerated_files=100000
+          opcache.max_wasted_percentage=5
+          opcache.validate_timestamps=0
+          EOF
           rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
           php -i
     - run:
