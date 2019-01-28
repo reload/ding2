@@ -105,6 +105,7 @@ legend {
 
 input[type="text"],
 input[type="password"],
+input[type="date"],
 input[type="email"] {
   @include placeholder {
     @include font('base');
