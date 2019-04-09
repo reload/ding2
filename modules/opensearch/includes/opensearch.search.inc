@@ -349,7 +349,7 @@ function _opensearch_search_relation_render_title(\TingRelation $relation) {
     case 'dbcaddi:hasReview':
       // If the relation has "isPartOf" it's always a better title than the one
       // in the object title as it is always "Anmeldelse".
-      $is_part_of = $object->getIsPartOf();
+      $is_part_of = (!empty($object)) ? $object->getIsPartOf() : [];
       if (!empty($is_part_of)) {
         $title = reset($is_part_of);
       }
