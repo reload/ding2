@@ -24,20 +24,15 @@ function ting_infomedia_get_article($id) {
     $request->setFaust($id);
 
     ting_infomedia_add_user_creds($request);
-    $ret = opensearch_execute($request->getRequest());
-    if (is_string($ret)) {
-      $ret = FALSE;
-    }
-    else {
-      $ret = $request->parse($ret);
-    }
+    $result = opensearch_execute($request->getRequest());
+    $return = (is_string($result)) ? $request->parse($result) : FALSE;
   }
   catch (TingClientException $exception) {
     watchdog_exception('infomedia', $exception);
-    return FALSE;
+    $return = FALSE;
   }
 
-  return $ret;
+  return $return;
 }
 
 /**
