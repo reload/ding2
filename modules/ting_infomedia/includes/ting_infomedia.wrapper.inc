@@ -145,9 +145,5 @@ function ting_infomedia_add_user_creds(TingClientInfomediaRequest $request) {
     // Do nothing.
   }
 
-  $name = isset($creds['name']) ? $creds['name'] : '';
-
-  // Check if user is authenticated.
-  ding_provider_invoke_page('user', 'authenticate', $name, $pass);
   return $request;
 }
