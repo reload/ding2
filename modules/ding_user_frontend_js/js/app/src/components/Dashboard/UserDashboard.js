@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../../css/UserDashboard.css';
 import { isPast, isFuture, differenceInDays } from 'date-fns';
 import Title from './Title';
 import Item from './Item';
