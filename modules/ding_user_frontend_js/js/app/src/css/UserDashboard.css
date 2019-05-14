@@ -22,6 +22,13 @@
   padding: 2px 5px;
 }
 
+.user-dashboard-title__count--is-loading {
+  background: linear-gradient(180deg, lightpink, deeppink);
+  background-size: 400% 400%;
+  animation: pulse-background 2s ease infinite;
+  color: transparent;
+}
+
 .user-dashboard-item {
   border: 1px solid lightgrey;
   border-radius: 5px;
@@ -31,6 +38,18 @@
   flex-direction: row;
   padding: 20px;
   margin: 0 20px 10px 0;
+}
+
+.user-dashboard-item--type-loans-overdue {
+  border-left-color: red;
+}
+
+.user-dashboard-item--type-loans-due {
+  border-left-color: yellow;
+}
+
+.user-dashboard-item--type-orders-ready {
+  border-left-color: green;
 }
 
 .user-dashboard-item--has-notification {
@@ -43,11 +62,12 @@
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: red;
+  background-color: deeppink;
   position: absolute;
   top: -5px;
   right: -5px;
   z-index: 1;
+  animation: scale-in-center 0.2s ease-in both;
 }
 
 .user-dashboard-item__title {
@@ -64,4 +84,34 @@
 .user-dashboard-item__count {
   padding: 10px 5px;
   background: lightgray;
+}
+
+.user-dashboard-item__count--is-loading {
+  background: linear-gradient(180deg, lightgray, darkgray);
+  background-size: 400% 400%;
+  animation: pulse-background 2s ease infinite;
+  color: transparent;
+}
+
+@keyframes pulse-background {
+  0% {
+    background-position:50% 0%
+  }
+  50% {
+    background-position:50% 100%
+  }
+  100% {
+     background-position:50% 0%
+  }
+}
+
+@keyframes scale-in-center {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
