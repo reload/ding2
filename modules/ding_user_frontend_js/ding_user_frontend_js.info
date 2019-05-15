@@ -3,3 +3,4 @@ description = User frontend elements - powered by JavaScript
 core = 7.x
 package = Ding!
 project = ding_user_frontend_js
+dependencies[] = ctools
