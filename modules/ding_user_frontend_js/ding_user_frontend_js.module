@@ -1,0 +1,7 @@
+<?php
+
+function ding_user_frontend_js_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && !empty($plugin)) {
+    return "plugins/$plugin";
+  }
+}
