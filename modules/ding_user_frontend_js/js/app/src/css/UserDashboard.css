@@ -1,12 +1,10 @@
 .user-dashboard {
   display: flex;
   flex-direction: row;
-  background: grey;
-  font-family: sans-serif;
 }
-.user-dashboard__left,
-.user-dashboard__right {
 
+.user-dashboard__column {
+  width: 50%;
 }
 
 .user-dashboard-title {
@@ -15,15 +13,16 @@
 }
 
 .user-dashboard-title__count {
-  background: lightpink;
+  background: #FFE6ED;
   border-radius: 5px;
   display: inline-block;
-  margin-left: 10px;
-  padding: 2px 5px;
+  margin-left: 15px;
+  padding: 4px 10px 2px;
+  line-height: 1;
 }
 
 .user-dashboard-title__count--is-loading {
-  background: linear-gradient(180deg, lightpink, deeppink);
+  background: linear-gradient(180deg, #FFE6ED, deeppink);
   background-size: 400% 400%;
   animation: pulse-background 2s ease infinite;
   color: transparent;
@@ -36,20 +35,43 @@
   background-color: white;
   display: flex;
   flex-direction: row;
+  margin: 0 25px 10px 0;
   padding: 20px;
-  margin: 0 20px 10px 0;
+}
+
+.user-dashboard-item__title {
+  background: #DBE0E0;
+  border-radius: 3px;
+  color: #282828;
+  display: inline-block;
+  font-size: 90%;
+  padding: 3px 10px;
 }
 
 .user-dashboard-item--type-loans-overdue {
-  border-left-color: red;
+  border-left-color: #E61B45;
+}
+
+.user-dashboard-item--type-loans-overdue .user-dashboard-item__title {
+  background: #E61B45;
+  color: #FFF;
 }
 
 .user-dashboard-item--type-loans-due {
-  border-left-color: yellow;
+  border-left-color: #FFBE06;
+}
+
+.user-dashboard-item--type-loans-due .user-dashboard-item__title {
+  background: #FFBE06;
 }
 
 .user-dashboard-item--type-orders-ready {
-  border-left-color: green;
+  border-left-color: #00AE15;
+}
+
+.user-dashboard-item--type-orders-ready .user-dashboard-item__title {
+  background: #00AE15;
+  color: #FFF;
 }
 
 .user-dashboard-item--has-notification {
@@ -62,7 +84,7 @@
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: deeppink;
+  background-color: #F21E69;
   position: absolute;
   top: -5px;
   right: -5px;
@@ -70,24 +92,25 @@
   animation: scale-in-center 0.2s ease-in both;
 }
 
-.user-dashboard-item__title {
-  background: lightgray;
-  border-radius: 3px;
-  color: darkgray;
-  display: inline-block;
-  padding: 2px 5px;
-}
-
 .user-dashboard-item__description {
+  font-size: 85%;
+  margin: 5px 0 0;
 }
 
 .user-dashboard-item__count {
-  padding: 10px 5px;
-  background: lightgray;
+  align-items: center;
+  background: #F7F7F7;
+  color: #595F63;
+  display: flex;
+  font-size: 125%;
+  height: 45px;
+  justify-content: center;
+  margin-right: 30px;
+  width: 30px;
 }
 
 .user-dashboard-item__count--is-loading {
-  background: linear-gradient(180deg, lightgray, darkgray);
+  background: linear-gradient(180deg, #F7F7F7, darkgray);
   background-size: 400% 400%;
   animation: pulse-background 2s ease infinite;
   color: transparent;
