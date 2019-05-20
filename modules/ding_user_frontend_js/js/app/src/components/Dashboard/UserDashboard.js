@@ -3,17 +3,23 @@ import { isPast, isFuture, differenceInDays } from 'date-fns';
 import Title from './Title';
 import Item from './Item';
 
-const API_URL = 'http://www.mocky.io/v2/5cda8e37300000680068c7cc?mocky-delay=5000ms';
+const API_URL = 'https://openplatform.dbc.dk/v3';
 
 function UserDashboard(props) {
+  const USER_API_URL = API_URL + '/user?access_token=' + props.token;
+
   const [data, setData] = useState({loans: [], orders: [], isFetching: false});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setData({loans: data.loans, orders: data.orders, isFetching: true});
-        const response = await fetch(API_URL).then(response => response.json());
-        setData({loans: response['data.json'].loans, orders: response['data.json'].orders, isFetching: false});
+        const response = await fetch(USER_API_URL, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }).then(response => response.json());
+        setData({loans: response['data'].loans, orders: response['data'].orders, isFetching: false});
       } catch (e) {
         console.log(e);
         setData({loans: data.loans, orders: data.orders, isFetching: false});
