@@ -1,7 +1,81 @@
 <?php
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+
 function ding_user_frontend_js_ctools_plugin_directory($module, $plugin) {
   if ($module == 'ctools' && !empty($plugin)) {
     return "plugins/$plugin";
   }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function ding_user_frontend_js_form_alter(&$form, &$form_state, $form_id) {
+  if (!in_array($form_id, ['user_login', 'user_login_block'])) {
+    return;
+  }
+
+  // Inject our own validation function into login forms. This allows us to
+  // access the user password for retrieving an OAuth token for the user. This
+  // is not available once login has completed.
+  $form['#validate'][] = 'ding_user_frontend_js_user_login_validate';
+
+}
+
+/**
+ * Login form validation function.
+ *
+ * @param $form array
+ *   The login form
+ * @param $form_state array
+ *   The form state
+ */
+function ding_user_frontend_js_user_login_validate(array $form, array &$form_state) {
+  try {
+    $client_id = variable_get('ding_user_frontend_js_client_id');
+    $client_secret = variable_get('ding_user_frontend_js_client_secret');
+
+    $username = ding_user_provider_id();
+    $pass = $form_state['values']['pass'];
+    $agency = variable_get('ting_agency', '');
+
+    $client = new Client(['base_uri' => 'https://auth.dbc.dk']);
+    $uri = '/oauth/token';
+    $response = $client->post($uri, [
+      'auth' => [$client_id, $client_secret],
+      'form_params' => [
+        'grant_type' => 'password',
+        'username' => $username . '@DK-' . $agency,
+        'password' => $pass
+      ]
+    ]);
+    $data = $response->getBody()->getContents();
+    $json = json_decode($data);
+
+    ding_user_frontend_js_user_token($json->access_token);
+  } catch (ClientException $e) {
+    // Errors should not propagate as we should be able to handle situations
+    // were we cannot retrieve a token.
+    watchdog_exception('ding_user_frontend_js', $e);
+  }
+}
+
+/**
+ * Accessor for user access tokens.
+ *
+ * @param string $token
+ *   The access token for the current user to set. Use NULL to not set the
+ *   token.
+ *
+ * @return string|NULL
+ *   The access token for the current user.
+ *
+ */
+function ding_user_frontend_js_user_token($token = NULL) {
+  if (!empty($token)) {
+    $_SESSION['ding_user_frontend_js_access_token'] = $token;
+  }
+  return $_SESSION['ding_user_frontend_js_access_token'];
 }

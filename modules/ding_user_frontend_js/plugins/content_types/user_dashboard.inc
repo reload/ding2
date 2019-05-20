@@ -19,7 +19,17 @@ $plugin = array(
  * Render callback function.
  */
 function ding_user_frontend_js_user_dashboard_render($subtype, $conf, $panel_args, $context) {
+  $token = ding_user_frontend_js_user_token();
+  if (empty($token)) {
+    watchdog('ding_user_frontend_js', 'Unable to render user dashboard. No API token available.', [],WATCHDOG_WARNING);
+    return;
+  }
+
   $block = new stdClass();
+
+  $block->content = [
+    '#markup' => '<div id="ding-user-frontend-js-user-dashboard" data-api-token="'. $token . '"/>',
+  ];
 
   // Scan to find JavaScript file names. Our current built pipeline adds hashes
   // to file names so we not not have static names to refer to.
@@ -36,17 +46,15 @@ function ding_user_frontend_js_user_dashboard_render($subtype, $conf, $panel_arg
     ];
   }, $js_files);
 
-  $block->content = [
-    '#markup' => '<div id="ding-user-frontend-js-user-dashboard"/>',
-    '#attached' => [
-      'css' => [
-        // We do not used the built CSS file. Drupal should be sufficient for
-        // optimizing it.
-        drupal_get_path('module', 'ding_user_frontend_js') . '/js/app/src/css/UserDashboard.css'
-      ],
-      'js' => $js_attachments
-    ]
+  $block->content['#attached'] = [
+    'css' => [
+      // We do not used the built CSS file. Drupal should be sufficient for
+      // optimizing it.
+      drupal_get_path('module', 'ding_user_frontend_js') . '/js/app/src/css/UserDashboard.css'
+    ],
+    'js' => $js_attachments
   ];
+
   return $block;
 }
 
