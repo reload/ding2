@@ -28,7 +28,6 @@ function connie_user_authenticate($name, $pass) {
 
     $res['creds'] = array(
       'name' => $name,
-      'pass' => $pass,
     );
 
     $res['user'] = array(
@@ -45,6 +44,7 @@ function connie_user_authenticate($name, $pass) {
     throw new DingProviderUserAuthFailure();
   }
 
+  ding_user_save_creds($res);
   return $res;
 }
 
