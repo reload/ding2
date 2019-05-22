@@ -38,6 +38,9 @@ module.exports = (_env, argv) => {
         }
       ],
     },
+    watchOptions: {
+      ignored: /node_modules/
+    },
     plugins: [
       new DrupalTranslationsWebpackPlugin({
         output: 'translations.js'
