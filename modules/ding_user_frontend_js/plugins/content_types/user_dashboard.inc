@@ -31,23 +31,30 @@ function ding_user_frontend_js_user_dashboard_render($subtype, $conf, $panel_arg
     '#markup' => '<div id="ding-user-frontend-js-user-dashboard" data-api-token="'. $token . '"/>',
   ];
 
-  // Scan to find JavaScript file names. Our current built pipeline adds hashes
-  // to file names so we not not have static names to refer to.
-  $js_files = file_scan_directory(drupal_get_path('module', 'ding_user_frontend_js') . '/js/app/dist', '/\.js$/');
-  $js_attachments = array_map(function($js_file) {
-    $uri = $js_file->uri;
-    return [
-      'type' => 'file',
-      'data' => $uri,
-      // With our current build pipeline some files need to go in
-      // the header for bootstrapping and others can be loaded later on. This
-      // should be addressed with a more specialized build pipeline.
-      'scope' => (strpos($uri, 'runtime') || strpos($uri, 'bundle')) ? 'header' : 'footer',
-    ];
-  }, $js_files);
-
+  $js_path = drupal_get_path('module', 'ding_user_frontend_js') . '/js/app/dist';
   $block->content['#attached'] = [
-    'js' => $js_attachments
+    'js' => [
+      [
+        'type' => 'file',
+        'data' => $js_path . '/runtime.js',
+        'scope' => 'header'
+      ],
+      [
+        'type' => 'file',
+        'data' => $js_path . '/bundle.js',
+        'scope' => 'header'
+      ],
+      [
+        'type' => 'file',
+        'data' => $js_path . '/dashboard.js',
+        'scope' => 'footer'
+      ],
+      [
+        'type' => 'file',
+        'data' => $js_path . '/translations.js',
+        'scope' => 'footer'
+      ]
+    ],
   ];
 
   return $block;
