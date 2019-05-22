@@ -41,15 +41,15 @@ function UserDashboard(props) {
   return (
     <div className="user-dashboard">
       <section className="user-dashboard__column">
-        <Title text={"Lån"} loading={data.isFetching} count={numLoans}/>
-        <Item type="loans-overdue" title={"Overskredet"} description={"Lån har overskredet afleveringsdatoen"} loading={data.isFetching} count={numLoansOverdue}/>
-        <Item type="loans-due" title={"Udløber snart"} description={"Lån udløber snart"} loading={data.isFetching} count={numLoansDueSoon} />
-        <Item type="loans-other" title={"Dine lån"} description={"Lån med længere udløbstid"} loading={data.isFetching} count={numOtherLoans} />
+        <Title text={Drupal.t("Loans")} loading={data.isFetching} count={numLoans}/>
+        <Item type="loans-overdue" title={Drupal.t("Overdue")} description={Drupal.t("Loans passed due date")} loading={data.isFetching} count={numLoansOverdue}/>
+        <Item type="loans-due" title={Drupal.t("Due soon")} description={Drupal.t("Loans with an upcoming due date")} loading={data.isFetching} count={numLoansDueSoon} />
+        <Item type="loans-other" title={Drupal.t("Your loans")} description={Drupal.t("Current loans")} loading={data.isFetching} count={numOtherLoans} />
       </section>
       <section className="user-dashboard__column">
-        <Title text={"Reserveringer"} loading={data.isFetching} count={numOrders}/>
-        <Item type="orders-ready" title={"Klar til afhentning"} description={"Reserveringer kan nu afhentes på biblioteket"} loading={data.isFetching} count={numOrdersPickup} />
-        <Item type="orders-other" title={"Du står i kø"} description={"Reserveringer du står i kø til"} loading={data.isFetching} count={numOtherOrders} />
+        <Title text={Drupal.t("Reservations")} loading={data.isFetching} count={numOrders}/>
+        <Item type="orders-ready" title={Drupal.t("Ready for pickup")} description={Drupal.t("Reservations ready for pickup at the library")} loading={data.isFetching} count={numOrdersPickup} />
+        <Item type="orders-other" title={Drupal.t("In queue")} description={Drupal.t("Reservations you are in queue for")} loading={data.isFetching} count={numOtherOrders} />
       </section>
     </div>
   );
