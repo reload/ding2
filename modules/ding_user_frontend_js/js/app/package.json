@@ -22,6 +22,7 @@
   },
   "scripts": {
     "build": "webpack --mode production",
-    "build:dev": "webpack --mode development"
+    "build:dev": "webpack --mode development",
+    "start": "webpack --mode development --watch"
   }
 }
