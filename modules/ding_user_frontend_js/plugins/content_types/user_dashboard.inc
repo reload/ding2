@@ -33,7 +33,7 @@ function ding_user_frontend_js_user_dashboard_render($subtype, $conf, $panel_arg
 
   // Scan to find JavaScript file names. Our current built pipeline adds hashes
   // to file names so we not not have static names to refer to.
-  $js_files = file_scan_directory(drupal_get_path('module', 'ding_user_frontend_js') . '/js/app/build/static/js', '/\.js$/');
+  $js_files = file_scan_directory(drupal_get_path('module', 'ding_user_frontend_js') . '/js/app/dist', '/\.js$/');
   $js_attachments = array_map(function($js_file) {
     $uri = $js_file->uri;
     return [
@@ -42,16 +42,11 @@ function ding_user_frontend_js_user_dashboard_render($subtype, $conf, $panel_arg
       // With our current build pipeline some files need to go in
       // the header for bootstrapping and others can be loaded later on. This
       // should be addressed with a more specialized build pipeline.
-      'scope' => (strpos($uri, 'main')) ? 'header' : 'footer',
+      'scope' => (strpos($uri, 'runtime') || strpos($uri, 'bundle')) ? 'header' : 'footer',
     ];
   }, $js_files);
 
   $block->content['#attached'] = [
-    'css' => [
-      // We do not used the built CSS file. Drupal should be sufficient for
-      // optimizing it.
-      drupal_get_path('module', 'ding_user_frontend_js') . '/js/app/src/css/UserDashboard.css'
-    ],
     'js' => $js_attachments
   ];
 
