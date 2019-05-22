@@ -1,3 +1,4 @@
+const DrupalTranslationsWebpackPlugin = require('drupal-translations-webpack-plugin')
 const path = require('path')
 
 module.exports = (_env, argv) => {
@@ -36,6 +37,11 @@ module.exports = (_env, argv) => {
           use: ['style-loader', 'css-loader']
         }
       ],
-    }
+    },
+    plugins: [
+      new DrupalTranslationsWebpackPlugin({
+        output: 'translations.js'
+      })
+    ]
   }
 }
