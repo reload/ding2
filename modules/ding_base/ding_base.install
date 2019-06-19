@@ -75,6 +75,7 @@ function ding_base_install() {
   variable_set('date_format_medium', 'D, d-m-Y H:i');
   variable_set('date_format_short', 'd-m-Y H:i');
 
+  module_load_include('install', 'jquery_update');
   _jquery_update_set_theme_version('seven', '1.7');
 }
 
