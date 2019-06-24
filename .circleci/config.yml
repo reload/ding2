@@ -78,27 +78,12 @@ jobs:
 
   site_install:
     docker:
-    - image: circleci/php:7.0-cli
+    - image: drupalci/php-7.0-apache:production
     - image: circleci/mysql:5.7.20-ram
     working_directory: ~/drupal
     steps:
     - attach_workspace:
         at: ~/
-    - run:
-        name: Configure PHP for Drupal
-        command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo -E docker-php-ext-install gd pdo_mysql
-          sudo chmod 0777 $PHP_INI_DIR/conf.d
-          echo "memory_limit = 512M" >> $PHP_INI_DIR/conf.d/docker-php-drupal.ini
-          rm -f $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
-          php -i
-    - run:
-        name: Install Drush
-        command: |
-          echo 'export PATH=~/.composer/vendor/bin:$PATH'  >> $BASH_ENV
-          source $BASH_ENV
-          composer global require drush/drush:6.* --prefer-source --no-interaction
     - run:
         name: Install Ding2 site
         command: |
@@ -127,27 +112,12 @@ jobs:
 
   unit_tests:
     docker:
-    - image: circleci/php:7.0-cli
+    - image: drupalci/php-7.0-apache:production
     - image: circleci/mysql:5.7.20-ram
     working_directory: ~/drupal
     steps:
     - attach_workspace:
         at: ~/
-    - run:
-        name: Configure PHP for Drupal
-        command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo -E docker-php-ext-install gd pdo_mysql
-          sudo chmod 0777 $PHP_INI_DIR/conf.d
-          echo "memory_limit = 512M" >> $PHP_INI_DIR/conf.d/docker-php-drupal.ini
-          rm -f $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
-          php -i
-    - run:
-        name: Install Drush
-        command: |
-          echo 'export PATH=~/.composer/vendor/bin:$PATH'  >> $BASH_ENV
-          source $BASH_ENV
-          composer global require drush/drush:6.* --prefer-source --no-interaction
     - run:
         name: Import database
         command: drush sqlq --file=$HOME/db/db.sql
@@ -172,7 +142,7 @@ jobs:
 
   behat_tests:
     docker:
-    - image: circleci/php:7.0-apache
+    - image: drupalci/php-7.0-apache:production
     - image: circleci/mysql:5.7.20-ram
     - image: justinribeiro/chrome-headless:stable
     working_directory: ~/drupal
@@ -180,29 +150,6 @@ jobs:
     steps:
     - attach_workspace:
         at: ~/
-    - run:
-        name: Configure PHP for Drupal
-        command: |
-          sudo apt install -y libpng-dev mysql-client
-          sudo -E docker-php-ext-install gd pdo_mysql
-          sudo chmod 0777 $PHP_INI_DIR/conf.d
-          echo "memory_limit = 512M" >> $PHP_INI_DIR/conf.d/docker-php-drupal.ini
-          rm -f $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
-          php -i
-    - run:
-        name: Configure Apache
-        command: |
-          sudo rm -rf /var/www/html
-          sudo ln -s ~/drupal /var/www/html
-          sudo chmod -R 0777 /var/www/html/sites/default
-          sudo a2enmod rewrite
-          sudo service apache2 restart
-    - run:
-        name: Install Drush
-        command: |
-          echo 'export PATH=~/.composer/vendor/bin:$PATH'  >> $BASH_ENV
-          source $BASH_ENV
-          composer global require drush/drush:6.* --prefer-source --no-interaction
     - run:
         name: Import database
         command: drush sqlq --file=$HOME/db/db.sql
