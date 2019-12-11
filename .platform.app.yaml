@@ -102,6 +102,7 @@ mounts:
 # The hooks executed at various points in the lifecycle of the application.
 hooks:
   build: |
+    drush dl registry_rebuild-7.x -y
     cd public/profiles/ding2/themes/ddbasic
     npm install
     node_modules/.bin/gulp uglify sass
