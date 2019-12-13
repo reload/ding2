@@ -50,7 +50,7 @@ function ding_react_ding_entity_buttons($type, $entity, $view_mode = 'default', 
       'text' => t('Tilføj til huskeliste'),
     ];
 
-    $return[] = ddb_react_app('add-to-checklist', $data);
+    $return[] = ding_react_app('add-to-checklist', $data);
 
     return $return;
   }
@@ -121,14 +121,14 @@ function ding_react_form_search_block_form_alter(&$form, $form_state) {
     'addButtonLabel' => t('Add'),
   ];
 
-  $add_search_button = ddb_react_app('add-to-searchlist', $data);
+  $add_search_button = ding_react_app('add-to-searchlist', $data);
 
   $form['search_block_form']['#field_suffix'] = drupal_render($add_search_button);
   $form['#attributes']['class'][] = 'has-add-to-searchlist';
 }
 
 /**
- * Return markup for an app.
+ * Return render array for an app.
  *
  * @param string $name
  *   Name of the app.
@@ -136,15 +136,16 @@ function ding_react_form_search_block_form_alter(&$form, $form_state) {
  *   Data for the app.
  *
  * @return array
- *   The app build.
+ *   The app render array.
  */
-function ddb_react_app($name, array $data = []) {
+function ding_react_app($name, array $data = []) {
   $attachments = [
     'libraries_load' => [
       ['ddb-react'],
     ],
     'js' => [
-      libraries_get_path('ddb-react') . '/' . $name . '.js' => ['scope' => 'footer', 'group' => JS_LIBRARY],
+      // Weight needs to be > 0 to make the app code run after the libraries.
+      libraries_get_path('ddb-react') . '/' . $name . '.js' => ['scope' => 'footer', 'group' => JS_LIBRARY, 'weight' => 1],
       drupal_get_path('module', 'ding_react') . '/js/ding-react.js' => ['scope' => 'footer'],
     ],
   ];
