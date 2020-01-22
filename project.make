@@ -625,7 +625,7 @@ libraries[smart-app-banner][download][url] = https://github.com/kudago/smart-app
 libraries[smart-app-banner][directory_name] = "smart-app-banner"
 libraries[smart-app-banner][destination] = "libraries"
 
-; For ding_react.
+; For ding_react
 libraries[ddb-react][download][type] = "get"
 libraries[ddb-react][download][url] = https://github.com/reload/ddb-react/releases/download/latest/dist.zip
 libraries[ddb-react][directory_name] = "ddb-react"
