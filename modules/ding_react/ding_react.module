@@ -19,7 +19,7 @@ function ding_react_libraries_info() {
       'version' => '1.0.0',
       'files' => [
         'js' => [
-          // File ordering is important here###
+          // File ordering is important here !
           'runtime.js' => ['scope' => 'footer', 'group' => JS_LIBRARY],
           'bundle.js' => ['scope' => 'footer', 'group' => JS_LIBRARY],
           'polyfills.js' => ['scope' => 'footer', 'group' => JS_LIBRARY],
