@@ -1,5 +1,10 @@
 <?php
 
+define('DING_REACT_FOLLOW_SEARCHES_PROD_URL', 'https://prod.followsearches.dandigbib.org');
+define('DING_REACT_FOLLOW_SEARCHES_STAGE_URL', 'https://stage.followsearches.dandigbib.org');
+define('DING_REACT_MATERIAL_LIST_PROD_URL', 'https://prod.materiallist.dandigbib.org');
+define('DING_REACT_MATERIAL_LIST_TEST_URL', 'https://test.materiallist.dandigbib.org');
+
 /**
  * @file
  * Ding React apps.
@@ -43,6 +48,12 @@ function ding_react_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['ding_react/user.js'] = [
+    'title' => 'Retrieve access token',
+    'page callback' => 'ding_react_user_js',
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  ];
 
   return $items;
 }
@@ -73,6 +84,7 @@ function ding_react_ding_entity_buttons($type, $entity, $view_mode = 'default', 
     $return = [];
 
     $data = [
+      'material-list-url' => ding_react_material_list_url(),
       'id' => $entity->ding_entity_id,
       'text' => t('Add to checklist'),
       'error-text' => t('An error occurred'),
@@ -93,22 +105,6 @@ function ding_react_ctools_plugin_directory($module, $plugin) {
   if ($module == 'ctools' || $module == 'panels') {
     return 'plugins/' . $plugin;
   }
-}
-
-/**
- * Implements hook_page_build().
- */
-function ding_react_page_build() {
-  $token = ding_provider_invoke('openplatform_token', 'get');
-
-  if ($token) {
-    drupal_add_js('window.localStorage.setItem("ddb-token", "' . $token . '")', 'inline');
-  } else {
-    drupal_add_js('window.localStorage.removeItem("ddb-token", "' . $token . '")', 'inline');
-  }
-
-  $authenticated = ($token) ? 'true' : 'false';
-  drupal_add_js("window.ddbReact = { 'userAuthenticated': ${authenticated} }", 'inline');
 }
 
 /**
@@ -147,6 +143,7 @@ function ding_react_form_search_block_form_alter(&$form, $form_state) {
   $fullTextQuery = $cqlDoctor->string_to_cql();
 
   $data = [
+    'follow-searches-url' => ding_react_follow_searches_url(),
     'default-title' => $title,
     'search-query' => $fullTextQuery,
     'login-url' => ding_react_login_url(),
@@ -187,6 +184,9 @@ function ding_react_app($name, array $data = []) {
     'js' => [
       // Weight needs to be > 0 to make the app code run after the libraries.
       libraries_get_path('ddb-react') . '/' . $name . '.js' => ['scope' => 'footer', 'group' => JS_LIBRARY, 'weight' => 1],
+      // Use our menu callback to mimic an external file which allows us to set
+      // per-user data which bypasses Varnish caching.
+      url('ding_react/user.js', ['absolute' => TRUE]) => ['scope' => 'footer', 'type' => 'external'],
       drupal_get_path('module', 'ding_react') . '/js/ding-react.js' => ['scope' => 'footer'],
     ],
   ];
@@ -218,6 +218,29 @@ function ding_react_app($name, array $data = []) {
 }
 
 /**
+ * Menu callback which renders a JavaScript file containing user data.
+ */
+function ding_react_user_js() {
+  // Ding Varnish will cache requests even for logged in users. Mark this
+  // page as not cacheable to bypass Varnish. Uses should not get each others
+  // token due to a cached response.
+  drupal_page_is_cacheable(FALSE);
+
+  drupal_add_http_header('Content-Type', 'application/javascript');
+  echo "window.ddbReact = window.ddbReact || {};\n";
+
+  $authenticated = ding_user_is_logged_in_with_sso() ? 'true' : 'false';
+  echo sprintf("window.ddbReact.userAuthenticated = %s;\n", $authenticated);
+
+  $token = ding_provider_invoke('openplatform_token', 'get');
+  if ($token) {
+    echo sprintf("window.ddbReact.setToken('%s');\n", $token);
+  }
+
+  drupal_exit();
+}
+
+/**
  * Generate a login url which can be used as a prop for React apps.
  *
  * @return string
@@ -229,6 +252,24 @@ function ding_react_login_url() {
     'login_url',
     ['query' => ['destination' => current_path()]]
   );
+}
+
+/**
+ * Returns the url to the instance of the Material List service to use.
+ *
+ * @return string
+ */
+function ding_react_material_list_url() {
+  return variable_get('ding_react_material_list_url', DING_REACT_MATERIAL_LIST_TEST_URL);
+}
+
+/**
+ * Returns the url to the instance of the Follow Searches service to use.
+ *
+ * @return string
+ */
+function ding_react_follow_searches_url() {
+  return variable_get('ding_react_follow_searches_url', DING_REACT_FOLLOW_SEARCHES_STAGE_URL);
 }
 
 function ding_react_admin_settings_form() {
@@ -243,7 +284,7 @@ function ding_react_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Material List'),
     '#description' => t('Url to the Material List service instance to use.'),
-    '#default_value' => variable_get('ding_react_material_list_url', ''),
+    '#default_value' => ding_react_material_list_url(),
     '#required' => TRUE,
     '#element_validate' => [ 'ding_react_element_validate_url' ],
   ];
@@ -252,7 +293,7 @@ function ding_react_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Follow Searches'),
     '#description' => t('Url to the Follow Searches service instance to use.'),
-    '#default_value' => variable_get('ding_react_follow_searches_url', ''),
+    '#default_value' => ding_react_follow_searches_url(),
     '#required' => TRUE,
     '#element_validate' => [ 'ding_react_element_validate_url' ],
   ];
