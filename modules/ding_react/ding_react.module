@@ -114,8 +114,8 @@ function ding_react_form_search_block_form_alter(&$form, $form_state) {
   global $user;
 
   // Check if function exists so we don't need to have a hard dependency on
-  // ting_search and opensearch.
-  if (!function_exists('ting_search_current_results') && module_exists('opensearch')) {
+  // ting_search.
+  if (!function_exists('ting_search_current_results')) {
     return;
   }
 
@@ -134,18 +134,19 @@ function ding_react_form_search_block_form_alter(&$form, $form_state) {
     return;
   }
 
-  $fullTextQuery = $searchRequest->getFullTextQuery();
-  $title = $fullTextQuery;
-
-  // In order to get the correct CQL query, it needs to be run through
-  // TingSearchCqlDoctor.
-  $cqlDoctor = new TingSearchCqlDoctor($fullTextQuery);
-  $fullTextQuery = $cqlDoctor->string_to_cql();
+  try {
+    $query = ding_provider_invoke('search', 'query_string', $searchRequest);
+  } catch (Exception $e) {
+    // Fall back on the full text query if the provider is not available or
+    // generation fails for some reason.
+    $query = $searchRequest->getFullTextQuery();
+  }
+  $title = $searchRequest->getFullTextQuery();
 
   $data = [
     'follow-searches-url' => ding_react_follow_searches_url(),
     'default-title' => $title,
-    'search-query' => $fullTextQuery,
+    'search-query' => $query,
     'login-url' => ding_react_login_url(),
     'button-text' => t('Add to followed searches'),
     'label' => t('Title for followed search'),
@@ -336,7 +337,7 @@ function ding_react_user_migrate(stdClass $account) {
   }
 
   if (!empty($legacy_uid)
-    && !preg_match("/${migrated_prefix}/", $legacy_uid)
+    && (strpos($legacy_uid, $migrated_prefix) === FALSE)
     && !empty($token)) {
     $migrate_request_options = [
       'method' => 'PUT',
@@ -349,7 +350,7 @@ function ding_react_user_migrate(stdClass $account) {
     ];
 
     $material_list_url = variable_get('ding_react_material_list_url');
-    $response = drupal_http_request("${material_list_url}/migrate/${legacy_uid}",
+    $response = drupal_http_request($material_list_url . '/migrate/' . $legacy_uid,
       $migrate_request_options);
     if (!empty($response->error)) {
       watchdog(
@@ -366,7 +367,7 @@ function ding_react_user_migrate(stdClass $account) {
     }
 
     $follow_searches_url = variable_get('ding_react_follow_searches_url');
-    $response = drupal_http_request("${follow_searches_url}/migrate/${legacy_uid}",
+    $response = drupal_http_request($follow_searches_url . '/migrate/' . $legacy_uid,
       $migrate_request_options);
     if (!empty($response->error)) {
       watchdog(
