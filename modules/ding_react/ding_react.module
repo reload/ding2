@@ -474,4 +474,5 @@ function ding_react_schema_alter(&$schema) {
       'description' => 'The openlist user id',
     );
   }
+  $i = 0;
 }
