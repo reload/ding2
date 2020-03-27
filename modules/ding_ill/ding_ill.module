@@ -1,0 +1,230 @@
+<?php
+
+/**
+ * @file
+ * Module for interlibrary loans.
+ */
+
+// TODO: Check if we need a custom version of ddb-react.
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function ding_ill_preprocess_html(&$variables) {
+  // If the material is unavailable, add a class to the body.
+  if (isset($GLOBALS['ding_ill_material_available']) && $GLOBALS['ding_ill_material_available'] === FALSE) {
+    $variables['classes_array'][] = 'no-holdings';
+  }
+}
+
+/**
+ * Implements hook_ding_entity_buttons().
+ */
+function ding_ill_ding_entity_buttons($type, $entity) {
+  global $user;
+
+  /** @var \TingEntity $entity */
+  $build = array();
+
+  if ($type !== 'ding_entity') {
+    return;
+  }
+
+  $ting_object = $entity->getTingObject();
+  $local_id = $entity->getLocalId();
+  $holdings = ding_availability_holdings([$local_id]);
+
+  $available = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
+
+  if ($ting_object->isOnline() || $available) {
+    return $build;
+  }
+  else {
+    // Add global variable to add body class when material is unavailable.
+    $GLOBALS['ding_ill_material_available'] = FALSE;
+  }
+
+  // If this is a "tidsskriftsartikel", link to bibliotek.dk.
+  if ($ting_object->getType() === 'Tidsskriftsartikel') {
+    $options = array(
+      'attributes' => array(
+        'class' => 'action-button button-order use-ajax',
+      ),
+    );
+
+    $build[] = [
+      '#type' => 'markup',
+      '#markup' => l(
+        t('Order at bibliotek.dk'),
+        'https://bibliotek.dk/linkme.php?rec.id=' . $ting_object->getId(),
+        $options
+      ),
+    ];
+
+    return $build;
+  }
+
+  $ids = [$entity->ding_entity_id];
+  // On collection view, ding_ill_preprocess_field has added a property with all
+  // the ids of entities to try and order.
+  if (isset($entity->ding_ill_ids)) {
+    $ids = $entity->ding_ill_ids;
+  }
+
+  // Determine options for the order based on user reservation
+  // preferences.
+  $default_options = ding_provider_invoke('reservation', 'default_options', $user);
+  $interest_period = $default_options["interest_period"];
+  $expiry = (new DateTime())
+    ->setTimestamp(REQUEST_TIME)
+    ->modify("+{$interest_period}days");
+  // Different providers have different option names for the
+  // preferred branch. Try to find the right one.
+  $preferred_branch_options = array_filter($default_options, function($option_name) {
+    return strpos($option_name, 'preferred_branch') !== FALSE;
+  }, ARRAY_FILTER_USE_KEY);
+  $preferred_branch = array_shift($preferred_branch_options);
+
+  $data = [
+    'text' => t('Order material from other library'),
+    'error-text' => t('An error occurred'),
+    'checking-text' => t('Checking if material can be ordered'),
+    'progress-text' => t('Ordering material'),
+    'unavailable-text' => t('Material cannot be orderd'),
+    'invalid-pickup-branch-text' => t('Your pickup branch does not accept orders'),
+    'success-text' => t('Ordered'),
+    'success-message' => t('Material ordered, your library will notify you when it is ready for pickup.'),
+    'ids' => implode(',', $ids),
+    'login-url' => ding_react_login_url(),
+    'pickup-branch' => $preferred_branch,
+    'expires' => $expiry->format('c'),
+  ];
+
+  $build[] = ding_react_app('order-material', $data);
+
+  return $build;
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensure ding_ill's implmentation of opensearch_pre_execute runs after the
+ * providers.
+ */
+function ding_ill_module_implements_alter(&$implementations, $hook) {
+  if ($hook != 'opensearch_pre_execute') {
+    return;
+  }
+  $ding_ill_implementation = $implementations['ding_ill'];
+  unset($implementations['ding_ill']);
+  $implementations['ding_ill'] = $ding_ill_implementation;
+}
+
+/**
+ * Implements hook_opensearch_pre_execute().
+ *
+ * When interlibrary loans are enabled, don't filter for local holdings.
+ */
+function ding_ill_opensearch_pre_execute($request) {
+  if ($request instanceof TingClientSearchRequest) {
+    $request->setFilterLocalHoldings(FALSE);
+  }
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function ding_ill_preprocess_field(&$variables) {
+  if ($variables['element']['#field_name'] == 'ting_entities') {
+    // Loop through the types. $variables['items'][0] must be a non-empty array,
+    // empty collection doesn't make sense (and if we should encounter one, a
+    // notice about it being an non-array is the least of our worries). But
+    // first off, bail out if the first material isn't fiction, as we'll only
+    // work on fiction materials.
+    $firstType = element_children($variables['items'][0])[0];
+    $firstPid = element_children($variables['items'][0][$firstType])[0];
+    /* @var \TingEntity $ting_entity */
+    $ting_entity = $variables['items'][0][$firstType][$firstPid]['#object'];
+    if (!$ting_entity->getTingObject()->isFiction()) {
+      return;
+    }
+    $view_mode = $variables['items'][0][$firstType][$firstPid]['#view_mode'];
+
+    foreach (element_children($variables['items'][0]) as $type) {
+      $materials = [];
+      $rendered_materials = [];
+      // In each material type group, group the materials again according to
+      // title.
+      foreach (element_children($variables['items'][0][$type]) as $pid) {
+        // Collect the objects grouped by title.
+        $object = $variables['items'][0][$type][$pid]['#object'];
+        $materials[$object->title][$pid] = $object;
+      }
+
+      foreach ($materials as $title => $items) {
+        foreach ($items as $object) {
+          // Add the ids of related materials to materials.
+          $object->ding_ill_ids = array_keys($items);
+
+          // Rerender the object. This is not optimal for performance, but the
+          // material has already been rendered with a button that only orders
+          // the specific material. There's no hooks between
+          // TingCollection::getEntities() constructing the list and
+          // ting_field_formatter_view rendering the materials, so we'll have to
+          // do it this way. If this is to be ported into Ding core, the
+          // internal caching of getEntities should be fixed.
+          // First off we need to ensure that fields gets re-rendered.
+          unset($object->_field_view_prepared);
+          $rendered_materials[$object->title][$object->getId()] = ting_object_view($object, $view_mode);
+        }
+      }
+
+      // Replace the types entities with re-rendered.
+      // First we have to reduce the rendered materials to a flat
+      // array.
+      $rendered_materials = array_reduce($rendered_materials, function($carry, $rendered_materials) {
+        return array_merge($carry, $rendered_materials);
+      }, []);
+      $variables['items'][0][$type] = array_merge(
+        $variables['items'][0][$type],
+        $rendered_materials
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_ting_object().
+ */
+function ding_ill_preprocess_ting_object(&$variables) {
+  /* @var \TingEntity $object */
+  $object = $variables['elements']['#object'];
+  $view_mode = $variables['elements']['#view_mode'];
+  if (!isset($object->ding_ill_ids)) {
+    return;
+  }
+
+  $ding_ill_ids = $object->ding_ill_ids;
+  $primary_id = array_shift($ding_ill_ids);
+
+  if ($object->getId() != $primary_id) {
+    $path = drupal_get_path('module', 'ding_ill');
+    $variables['elements'] = drupal_array_merge_deep(
+      $variables['elements'],
+      [
+        '#attached' => [
+          'css' => [
+            $path . '/ding_ill.css'
+          ],
+          'js' => [
+            $path . '/ding_ill.js'
+          ]
+        ]
+      ]
+    );
+
+    $variables['classes_array'][] = 'js-ding-ill-collapsible';
+    $variables['classes_array'][] = 'ding-ill-collapsed';
+  }
+
+}

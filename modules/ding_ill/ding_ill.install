@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the ding_ill module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function ding_ill_install() {
+  // We need to ensure that our opensearch_preexecute_alter is called last
+  // Fiddling with opensearch_preexecute_alter is complex so we bump weight to
+  // ensure that we run after ding_react.
+  db_update('system')
+    ->fields(array('weight' => 5))
+    ->condition('name', 'ding_ill', '=')
+    ->execute();
+}

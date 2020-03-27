@@ -1,0 +1,54 @@
+/**
+ * Interlibrary loans styling.
+ */
+
+/**
+ * Collapsible elements
+ */
+.js-ding-ill-collapsible * {
+  /* Base selectors are so verbose it makes no sense to override in a sensible
+     manner */
+  cursor: pointer !important;
+}
+
+/* Borrow arrow elements from the theme to indicate collapsing. */
+.js-ding-ill-collapsible > .inner::after {
+  font-family: 'icomoon';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 54px;
+  display: block;
+  position: absolute;
+  /* Guesstimate to center-align arrow */
+  top: 39px;
+  right: 0;
+  content: "\e901";
+}
+
+.js-ding-ill-collapsible.ding-ill-collapsed > .inner::after {
+  content: "\e902";
+}
+
+/* Hide most elements when an item is collapsed */
+.ding-ill-collapsed .ting-cover,
+.ding-ill-collapsed .field-type-ting-abstract,
+.ding-ill-collapsed .field-type-ting-series,
+.ding-ill-collapsed .field-type-ting-subjects,
+.ding-ill-collapsed .field-type-ding-entity-buttons,
+/* Extra selectors to add specificity */
+.ting-object.ding-ill-collapsed .ting-object-left.group-ting-left-col-collection
+{
+  display: none;
+}
+
+/* Make links appear as normal text. Clicking in a collapsed box should expand
+   it */
+.ding-ill-collapsed a,
+.ding-ill-collapsed.ting-object.list-item-style .field-name-ting-title h2 a {
+  color: #474747;
+}
