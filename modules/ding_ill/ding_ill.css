@@ -27,11 +27,11 @@
   /* Guesstimate to center-align arrow */
   top: 39px;
   right: 0;
-  content: "\e901";
+  content: "\e905";
 }
 
 .js-ding-ill-collapsible.ding-ill-collapsed > .inner::after {
-  content: "\e902";
+  content: "\e901";
 }
 
 /* Hide most elements when an item is collapsed */
