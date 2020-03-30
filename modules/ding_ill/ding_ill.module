@@ -90,15 +90,15 @@ function ding_ill_ding_entity_buttons($type, $entity) {
     'progress-text' => t('Ordering material'),
     'unavailable-text' => t('Material cannot be orderd'),
     'invalid-pickup-branch-text' => t('Your pickup branch does not accept orders'),
-    'success-text' => t('Ordered'),
+    'success-text' => t('Material ordered'),
     'success-message' => t('Material ordered, your library will notify you when it is ready for pickup.'),
     'ids' => implode(',', $ids),
     'login-url' => ding_react_login_url(),
     'pickup-branch' => $preferred_branch,
-    'expires' => $expiry->format('c'),
+    'expires' => $expiry->format('Y-m-d'),
   ];
 
-  $build[] = ding_ill_react_app('order-material', $data);
+  $build[] = ding_react_app('order-material', $data);
 
   return $build;
 }
@@ -224,49 +224,49 @@ function ding_ill_preprocess_ting_object(&$variables) {
     $variables['classes_array'][] = 'js-ding-ill-collapsible';
     $variables['classes_array'][] = 'ding-ill-collapsed';
   }
-
 }
 
 /**
- * Implements hook_libraries_info_alter().
+ * Implements hook_js_alter().
  */
-function ding_ill_libraries_info_alter(&$libraries) {
-  // Use the custom build of the ddb-react library provided by this module.
-  $libraries['ddb-react']['library path'] = drupal_get_path('module', 'ding_ill') . '/libraries/ddb-react';
+function ding_ill_js_alter(&$javascript) {
+  $javascript = ding_ill_replace_ddb_react($javascript);
 }
 
 /**
- * React application root supporting custom builds
+ * Implements hook_css_alter().
+ */
+function ding_ill_css_alter(&$css) {
+  $css = ding_ill_replace_ddb_react($css);
+}
+
+/**
+ * Replace ddb-react assets with custom version.
  *
- * @see ding_react_app().
+ * @param array $files
+ *   A map from file paths to options array as set by drupal_add_js() and
+ *   drupal_add_css().
+ *
+ * @return array
+ *   An updated map where file paths to default ddb-reacr library is replaced
+ *   by a custom version.
  */
-function ding_ill_react_app($name, array $data = []) {
-  $build = ding_react_app($name, $data);
+function ding_ill_replace_ddb_react(array $files)
+{
+  $ddb_react_path = libraries_get_path('ddb-react');
+  $ding_ill_ddb_react_path = drupal_get_path('module',
+      'ding_ill') . '/libraries/ddb-react';
 
-  // Replace default application files with ones provided by our module.
-  $library = libraries_info('ddb-react');
-  $path = $library['library path'];
-  if (empty($path)) {
-    $path = libraries_get_path('ddb-react');
-  }
+  $ddb_react_files = array_filter($files,
+    function ($file) use ($ddb_react_path) {
+      return strpos($file, $ddb_react_path) === 0;
+    }, ARRAY_FILTER_USE_KEY);
 
-  // Assume that the application file is the first file.
-  $js_options = array_shift($build['#attached']['js']);
-  $js_file = "${path}/${name}.js";
-  $build['#attached']['js'] = array_merge(
-    [ $js_file => $js_options ],
-    $build['#attached']['js']
-  );
+  array_walk($ddb_react_files,
+    function (array &$file) use ($ddb_react_path, $ding_ill_ddb_react_path) {
+      $file['data'] = str_replace($ddb_react_path, $ding_ill_ddb_react_path,
+        $file['data']);
+    });
 
-  // Assume that the css file is the first file.
-  $css_options = array_shift($build['#attached']['css']);
-  $css_file = "{$path}/${name}.css";
-  if (!empty($css_options) && file_exists($css_file)) {
-    $build['#attached']['css'] = array_merge(
-      [ $css_file => $css_options ],
-      $build['#attached']['css']
-    );
-  }
-
-  return $build;
+  return array_merge($files, $ddb_react_files);
 }
