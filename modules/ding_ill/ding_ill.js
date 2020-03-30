@@ -8,7 +8,11 @@
     attach: function(context, settings) {
       $('.js-ding-ill-collapsible', context).click(function(e) {
         $(this).toggleClass('ding-ill-collapsed');
-        e.preventDefault();
+        // Disable clicks/links if the material is collapsed. We only
+        // want to expand here.
+        if ($(this).hasClass('ding-ill-collapsed')) {
+          e.preventDefault();
+        }
       });
     }
   };
