@@ -5,8 +5,6 @@
  * Module for interlibrary loans.
  */
 
-// TODO: Check if we need a custom version of ddb-react.
-
 /**
  * Implements hook_preprocess_html().
  */
@@ -100,7 +98,7 @@ function ding_ill_ding_entity_buttons($type, $entity) {
     'expires' => $expiry->format('c'),
   ];
 
-  $build[] = ding_react_app('order-material', $data);
+  $build[] = ding_ill_react_app('order-material', $data);
 
   return $build;
 }
@@ -227,4 +225,48 @@ function ding_ill_preprocess_ting_object(&$variables) {
     $variables['classes_array'][] = 'ding-ill-collapsed';
   }
 
+}
+
+/**
+ * Implements hook_libraries_info_alter().
+ */
+function ding_ill_libraries_info_alter(&$libraries) {
+  // Use the custom build of the ddb-react library provided by this module.
+  $libraries['ddb-react']['library path'] = drupal_get_path('module', 'ding_ill') . '/libraries/ddb-react';
+}
+
+/**
+ * React application root supporting custom builds
+ *
+ * @see ding_react_app().
+ */
+function ding_ill_react_app($name, array $data = []) {
+  $build = ding_react_app($name, $data);
+
+  // Replace default application files with ones provided by our module.
+  $library = libraries_info('ddb-react');
+  $path = $library['library path'];
+  if (empty($path)) {
+    $path = libraries_get_path('ddb-react');
+  }
+
+  // Assume that the application file is the first file.
+  $js_options = array_shift($build['#attached']['js']);
+  $js_file = "${path}/${name}.js";
+  $build['#attached']['js'] = array_merge(
+    [ $js_file => $js_options ],
+    $build['#attached']['js']
+  );
+
+  // Assume that the css file is the first file.
+  $css_options = array_shift($build['#attached']['css']);
+  $css_file = "{$path}/${name}.css";
+  if (!empty($css_options) && file_exists($css_file)) {
+    $build['#attached']['css'] = array_merge(
+      [ $css_file => $css_options ],
+      $build['#attached']['css']
+    );
+  }
+
+  return $build;
 }
