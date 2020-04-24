@@ -71,17 +71,26 @@ function ding_ill_ding_entity_buttons($type, $entity) {
 
   // Determine options for the order based on user reservation
   // preferences.
-  $default_options = ding_provider_invoke('reservation', 'default_options', $user);
-  $interest_period = $default_options["interest_period"];
-  $expiry = (new DateTime())
-    ->setTimestamp(REQUEST_TIME)
-    ->modify("+{$interest_period}days");
-  // Different providers have different option names for the
-  // preferred branch. Try to find the right one.
-  $preferred_branch_options = array_filter($default_options, function($option_name) {
-    return strpos($option_name, 'preferred_branch') !== FALSE;
-  }, ARRAY_FILTER_USE_KEY);
-  $preferred_branch = array_shift($preferred_branch_options);
+  try {
+    $default_options = ding_provider_invoke('reservation', 'default_options',
+      $user);
+    $interest_period = $default_options["interest_period"];
+    $expiry = (new DateTime())
+      ->setTimestamp(REQUEST_TIME)
+      ->modify("+{$interest_period}days");
+    // Different providers have different option names for the
+    // preferred branch. Try to find the right one.
+    $preferred_branch_options = array_filter($default_options,
+      function ($option_name) {
+        return strpos($option_name, 'preferred_branch') !== false;
+      }, ARRAY_FILTER_USE_KEY);
+    $preferred_branch = array_shift($preferred_branch_options);
+  } catch (DingProviderAuthException $e) {
+    // Do nothing. The React component should also pick up on the fact
+    // that the user is not logged in and redirect to the login url.
+    // Set expiry to now to have a object to work with.
+    $expiry = new DateTime();
+  }
 
   $data = [
     'text' => t('Order material from other library'),
