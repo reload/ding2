@@ -2,17 +2,35 @@
  * Interlibrary loans styling.
  */
 
-/**
- * Collapsible elements
- */
-.js-ding-ill-collapsible * {
-  /* Base selectors are so verbose it makes no sense to override in a sensible
-     manner */
-  cursor: pointer !important;
+
+.ding-ill--material-group > * {
+  display: none;
 }
 
-/* Borrow arrow elements from the theme to indicate collapsing. */
-.js-ding-ill-collapsible > .inner::after {
+.ding-ill--material-group > :first-child {
+  display: block;
+}
+
+.ding-ill--material-group__expanded > * {
+  display: block;
+}
+
+.ding-ill--material-group-toggle {
+  border: 0 solid rgba(38,38,38,.2);
+  border-width: 1px 0;
+  cursor: pointer;
+  height: 80px;
+  line-height: 42px;
+  padding: 19px 15px;
+  vertical-align: center;
+}
+
+.ding-ill--material-group-toggle-text {
+  display: block;
+  position: relative;
+}
+
+.ding-ill--material-group-toggle-text::after {
   font-family: 'icomoon';
   speak: none;
   font-style: normal;
@@ -24,31 +42,21 @@
   font-size: 54px;
   display: block;
   position: absolute;
-  /* Guesstimate to center-align arrow */
-  top: 39px;
+  top: 0;
   right: 0;
   content: "\e905";
+  border-radius: 5px;
+  height: 40px;
+  line-height: 40px;
+  background-color: #808285;
 }
 
-.js-ding-ill-collapsible.ding-ill-collapsed > .inner::after {
+.ding-ill--material-group__expanded .ding-ill--material-group-toggle-text::after {
   content: "\e901";
 }
 
-/* Hide most elements when an item is collapsed */
-.ding-ill-collapsed .ting-cover,
-.ding-ill-collapsed .field-type-ting-abstract,
-.ding-ill-collapsed .field-type-ting-series,
-.ding-ill-collapsed .field-type-ting-subjects,
-.ding-ill-collapsed .field-type-ding-entity-buttons,
-/* Extra selectors to add specificity */
-.ting-object.ding-ill-collapsed .ting-object-left.group-ting-left-col-collection
-{
-  display: none;
-}
-
-/* Make links appear as normal text. Clicking in a collapsed box should expand
-   it */
-.ding-ill-collapsed a,
-.ding-ill-collapsed.ting-object.list-item-style .field-name-ting-title h2 a {
-  color: #474747;
+/* Odd hack needed to work with the current floating */
+.inner .ding-ill--material-group-toggle {
+  float: left;
+  width: 100%;
 }

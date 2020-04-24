@@ -186,14 +186,29 @@ function ding_ill_preprocess_field(&$variables) {
         }
       }
 
+      // Wrap each material type title group with attached styling and behavior.
+      $path = drupal_get_path('module', 'ding_ill');
+      $rendered_materials = array_map(function($rendered_material_group) use ($path) {
+        return array_merge(
+          [
+            '#prefix' => '<div class="ding-ill--material-group js-ding-ill-material-group">',
+            '#suffix' => '</div>',
+            '#attached' => [
+              'css' => [ $path . '/ding_ill.css' ],
+              'js' => [ $path . '/ding_ill.js' ]
+            ]
+          ],
+          $rendered_material_group
+        );
+      }, $rendered_materials);
+
       // Replace the types entities with re-rendered.
-      // First we have to reduce the rendered materials to a flat
-      // array.
-      $rendered_materials = array_reduce($rendered_materials, function($carry, $rendered_materials) {
-        return array_merge($carry, $rendered_materials);
-      }, []);
       $variables['items'][0][$type] = array_merge(
-        $variables['items'][0][$type],
+        // Keep non-children from existing items to preserve any #prefix etc.
+        array_diff_key(
+          $variables['items'][0][$type],
+          array_flip(element_children($variables['items'][0][$type]))
+        ),
         $rendered_materials
       );
     }
@@ -206,32 +221,8 @@ function ding_ill_preprocess_field(&$variables) {
 function ding_ill_preprocess_ting_object(&$variables) {
   /* @var \TingEntity $object */
   $object = $variables['elements']['#object'];
-  $view_mode = $variables['elements']['#view_mode'];
-  if (!isset($object->ding_ill_ids)) {
-    return;
-  }
-
-  $ding_ill_ids = $object->ding_ill_ids;
-  $primary_id = array_shift($ding_ill_ids);
-
-  if ($object->getId() != $primary_id) {
-    $path = drupal_get_path('module', 'ding_ill');
-    $variables['elements'] = drupal_array_merge_deep(
-      $variables['elements'],
-      [
-        '#attached' => [
-          'css' => [
-            $path . '/ding_ill.css'
-          ],
-          'js' => [
-            $path . '/ding_ill.js'
-          ]
-        ]
-      ]
-    );
-
-    $variables['classes_array'][] = 'js-ding-ill-collapsible';
-    $variables['classes_array'][] = 'ding-ill-collapsed';
+  if (isset($object->ding_ill_ids)) {
+    $variables['classes_array'][] = 'js-ding-ill-material';
   }
 }
 
