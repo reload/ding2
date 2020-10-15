@@ -82,10 +82,11 @@ function ding_ill_ding_entity_buttons($type, $entity) {
     // preferred branch. Try to find the right one.
     $preferred_branch_options = array_filter($default_options,
       function ($option_name) {
-        return strpos($option_name, 'preferred_branch') !== false;
+        return strpos($option_name, 'preferred_branch') !== FALSE;
       }, ARRAY_FILTER_USE_KEY);
     $preferred_branch = array_shift($preferred_branch_options);
-  } catch (DingProviderAuthException $e) {
+  }
+  catch (DingProviderAuthException $e) {
     // Do nothing. The React component should also pick up on the fact
     // that the user is not logged in and redirect to the login url.
     // Set expiry to now to have a object to work with.
@@ -168,7 +169,7 @@ function ding_ill_preprocess_field(&$variables) {
         $materials[$object->title][$pid] = $object;
       }
 
-      foreach ($materials as $title => $items) {
+      foreach ($materials as $items) {
         foreach ($items as $object) {
           // Add the ids of related materials to materials.
           $object->ding_ill_ids = array_keys($items);
@@ -188,15 +189,15 @@ function ding_ill_preprocess_field(&$variables) {
 
       // Wrap each material type title group with attached styling and behavior.
       $path = drupal_get_path('module', 'ding_ill');
-      $rendered_materials = array_map(function($rendered_material_group) use ($path) {
+      $rendered_materials = array_map(function ($rendered_material_group) use ($path) {
         return array_merge(
           [
             '#prefix' => '<div class="ding-ill--material-group js-ding-ill-material-group">',
             '#suffix' => '</div>',
             '#attached' => [
-              'css' => [ $path . '/ding_ill.css' ],
-              'js' => [ $path . '/ding_ill.js' ]
-            ]
+              'css' => [$path . '/ding_ill.css'],
+              'js' => [$path . '/ding_ill.js'],
+            ],
           ],
           $rendered_material_group
         );
@@ -251,22 +252,21 @@ function ding_ill_css_alter(&$css) {
  *   An updated map where file paths to default ddb-reacr library is replaced
  *   by a custom version.
  */
-function ding_ill_replace_ddb_react(array $files)
-{
+function ding_ill_replace_ddb_react(array $files) {
   $ddb_react_path = libraries_get_path('ddb-react');
   $ding_ill_ddb_react_path = drupal_get_path('module',
-      'ding_ill') . '/libraries/ddb-react';
+  'ding_ill') . '/libraries/ddb-react';
 
   $ddb_react_files = array_filter($files,
-    function ($file) use ($ddb_react_path) {
-      return strpos($file, $ddb_react_path) === 0;
-    }, ARRAY_FILTER_USE_KEY);
+  function ($file) use ($ddb_react_path) {
+    return strpos($file, $ddb_react_path) === 0;
+  }, ARRAY_FILTER_USE_KEY);
 
   array_walk($ddb_react_files,
-    function (array &$file) use ($ddb_react_path, $ding_ill_ddb_react_path) {
-      $file['data'] = str_replace($ddb_react_path, $ding_ill_ddb_react_path,
-        $file['data']);
-    });
+  function (array &$file) use ($ddb_react_path, $ding_ill_ddb_react_path) {
+    $file['data'] = str_replace($ddb_react_path, $ding_ill_ddb_react_path,
+    $file['data']);
+  });
 
   return array_merge($files, $ddb_react_files);
 }
