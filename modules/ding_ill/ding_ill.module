@@ -13,6 +13,10 @@ function ding_ill_preprocess_html(&$variables) {
   if (isset($GLOBALS['ding_ill_material_available']) && $GLOBALS['ding_ill_material_available'] === FALSE) {
     $variables['classes_array'][] = 'no-holdings';
   }
+
+  // Need Drupal.settings.ding_ill to trigger label change in
+  // ding_availability_labels.js, but we don't really need any settings.
+  drupal_add_js(['ding_ill' => ['active' => TRUE]], 'setting');
 }
 
 /**
