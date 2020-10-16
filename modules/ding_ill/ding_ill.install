@@ -17,3 +17,27 @@ function ding_ill_install() {
     ->condition('name', 'ding_ill', '=')
     ->execute();
 }
+
+/**
+ * Implements hook_enable().
+ *
+ * We need to remove the search branch blacklist as it would filter out
+ * materials in other libraries (it's actually more of a reverse whitelist).
+ */
+function ding_ill_enable() {
+  variable_set('ding_ill_branches_blacklist_backup', variable_get('fbs_branches_blacklist', []));
+  variable_set('fbs_branches_blacklist', []);
+}
+
+/**
+ * Implements hook_disable().
+ *
+ * Restore the search branch blacklist when we're disabled.
+ */
+function ding_ill_disable() {
+  $blacklist = variable_get('ding_ill_branches_blacklist_backup', []);
+  if ($blacklist) {
+    variable_set('fbs_branches_blacklist', $blacklist);
+  }
+  variable_del('ding_ill_branches_blacklist_backup');
+}
