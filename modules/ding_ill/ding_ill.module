@@ -51,7 +51,6 @@ function ding_ill_ding_entity_buttons($type, $entity) {
     'Avis',
     'Periodikum',
     'Tidsskrift',
-    'Tidsskriftsartikel',
     'Årbog',
   ];
   if (in_array($ting_object->getType(), $types)) {
