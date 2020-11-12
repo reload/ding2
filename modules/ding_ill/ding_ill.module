@@ -33,12 +33,8 @@ function ding_ill_ding_entity_buttons($type, $entity) {
   }
 
   $ting_object = $entity->getTingObject();
-  $local_id = $entity->getLocalId();
-  $holdings = ding_availability_holdings([$local_id]);
 
-  $available = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
-
-  if ($ting_object->isOnline() || $available) {
+  if (_ding_ill_is_local($entity)) {
     return $build;
   }
   else {
@@ -184,6 +180,15 @@ function ding_ill_preprocess_field(&$variables) {
           // Add the ids of related materials to materials.
           $object->ding_ill_ids = array_keys($items);
 
+          if (!isset($rendered_materials[$object->title])) {
+            // Using two buckets in order to order local materials before ill
+            // materials.
+            $rendered_materials[$object->title] = [
+              'local' => [],
+              'ill' => [],
+            ];
+          }
+
           // Rerender the object. This is not optimal for performance, but the
           // material has already been rendered with a button that only orders
           // the specific material. There's no hooks between
@@ -193,7 +198,8 @@ function ding_ill_preprocess_field(&$variables) {
           // internal caching of getEntities should be fixed.
           // First off we need to ensure that fields gets re-rendered.
           unset($object->_field_view_prepared);
-          $rendered_materials[$object->title][$object->getId()] = ting_object_view($object, $view_mode);
+          $key = _ding_ill_is_local($object) ? 'local' : 'ill';
+          $rendered_materials[$object->title][$key][$object->getId()] = ting_object_view($object, $view_mode);
         }
       }
 
@@ -209,7 +215,8 @@ function ding_ill_preprocess_field(&$variables) {
               'js' => [$path . '/ding_ill.js'],
             ],
           ],
-          $rendered_material_group
+          $rendered_material_group['local'],
+          $rendered_material_group['ill']
         );
       }, $rendered_materials);
 
@@ -279,4 +286,28 @@ function ding_ill_replace_ddb_react(array $files) {
   });
 
   return array_merge($files, $ddb_react_files);
+}
+
+/**
+ * Check if entity is a local material.
+ *
+ * @param object $entity
+ *   The entity to check.
+ *
+ * @return bool
+ *   Whether it's local.
+ */
+function _ding_ill_is_local($entity) {
+  $is_local = &drupal_static(__FUNCTION__);
+  if (!isset($is_local[$entity->getId()])) {
+    $ting_object = $entity->getTingObject();
+    $local_id = $entity->getLocalId();
+    $holdings = ding_availability_holdings([$local_id]);
+
+    $available = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
+
+    $is_local[$entity->getId()] = $ting_object->isOnline() || $available;
+  }
+
+  return $is_local[$entity->getId()];
 }
