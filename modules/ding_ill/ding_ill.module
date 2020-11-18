@@ -20,6 +20,56 @@ function ding_ill_preprocess_html(&$variables) {
 }
 
 /**
+ * Implements hook_menu().
+ */
+function ding_ill_menu() {
+  $items['ding_ill/openholdingstatus/%'] = [
+    'title' => 'OpenHoldingStatus',
+    'page callback' => 'ding_ill_openholdingstatus',
+    'page arguments' => [2],
+    // Allow anyone to access.
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  ];
+
+  $items['admin/config/ding/ill'] = array(
+    'title' => 'Ding ILL button',
+    'description' => 'Configure the inter-library loan button.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ding_ill_settings'),
+    'access arguments' => array('administer ding provider'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Settings form.
+ */
+function ding_ill_settings() {
+  $form['ding_ill_auth_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+    '#default_value' => variable_get('ding_ill_auth_name', ''),
+  );
+
+  $form['ding_ill_auth_pass'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Password'),
+    '#default_value' => variable_get('ding_ill_auth_pass', ''),
+  );
+
+  $form['ding_ill_auth_group'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Group'),
+    '#default_value' => variable_get('ding_ill_auth_group', ''),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
  * Implements hook_ding_entity_buttons().
  */
 function ding_ill_ding_entity_buttons($type, $entity) {
@@ -79,7 +129,7 @@ function ding_ill_ding_entity_buttons($type, $entity) {
   // preferences.
   try {
     $default_options = ding_provider_invoke('reservation', 'default_options',
-      $user);
+    $user);
     $interest_period = $default_options["interest_period"];
     $expiry = (new DateTime())
       ->setTimestamp(REQUEST_TIME)
@@ -87,9 +137,9 @@ function ding_ill_ding_entity_buttons($type, $entity) {
     // Different providers have different option names for the
     // preferred branch. Try to find the right one.
     $preferred_branch_options = array_filter($default_options,
-      function ($option_name) {
-        return strpos($option_name, 'preferred_branch') !== FALSE;
-      }, ARRAY_FILTER_USE_KEY);
+    function ($option_name) {
+      return strpos($option_name, 'preferred_branch') !== FALSE;
+    }, ARRAY_FILTER_USE_KEY);
     $preferred_branch = array_shift($preferred_branch_options);
   }
   catch (DingProviderAuthException $e) {
@@ -110,6 +160,7 @@ function ding_ill_ding_entity_buttons($type, $entity) {
     'success-message' => t('Material ordered, your library will notify you when it is ready for pickup.'),
     'ids' => implode(',', $ids),
     'login-url' => ding_react_login_url(),
+    'ill-check-url' => url('ding_ill/openholdingstatus', ['absolute' => TRUE]),
     'pickup-branch' => $preferred_branch,
     'expires' => $expiry->format('Y-m-d'),
   ];
@@ -286,6 +337,142 @@ function ding_ill_replace_ddb_react(array $files) {
   });
 
   return array_merge($files, $ddb_react_files);
+}
+
+/**
+ * Ajax openholdingstatus callback.
+ *
+ * @param string $pids
+ *   Comma-separated list of pids.
+ */
+function ding_ill_openholdingstatus(string $pids) {
+  drupal_add_http_header('Access-Control-Allow-Origin', '*');
+  drupal_page_is_cacheable(FALSE);
+  $debug = isset($_GET['debug']);
+  $res = ['canBeOrdered' => FALSE];
+  if ($debug) {
+    $res['debug'] = [];
+  }
+
+  $pids = explode(',', $pids);
+
+  if ($pids) {
+    $authXml = <<<EOF
+  <ns1:authentication>
+    <ns1:userIdAut>%s</ns1:userIdAut>
+    <ns1:passwordAut>%s</ns1:passwordAut>
+    <ns1:groupIdAut>%s</ns1:groupIdAut>
+  </ns1:authentication>
+EOF;
+
+    $authXml = sprintf(
+      $authXml,
+      variable_get('ding_ill_auth_name', ''),
+      variable_get('ding_ill_auth_pass', ''),
+      variable_get('ding_ill_auth_group', '')
+    );
+    $xml = <<<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://oss.dbc.dk/ns/openholdingstatus"><SOAP-ENV:Body>
+<ns1:localisationsRequest>
+%s
+  <ns1:agencyId>DK-870970</ns1:agencyId>
+%s
+  <ns1:mergePids>false</ns1:mergePids>
+  <ns1:outputType>json</ns1:outputType>
+</ns1:localisationsRequest>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>
+EOF;
+
+    $xmlPids = implode("\n", array_map(function ($pid) {
+      return sprintf('    <ns1:pid>%s</ns1:pid>', $pid);
+    }, $pids));
+
+    // Compile a list of libraries that has the material and under what pid (it
+    // might not be the same as the one we asked on).
+    $response = drupal_http_request(
+      'https://openholdingstatus.addi.dk/3.1/',
+      ['data' => sprintf($xml, $authXml, $xmlPids)]
+    );
+    $json = json_decode($response->data, TRUE);
+
+    $agencyPids = [];
+    // Parse BadgerFish response. Don't know if there'll ever be more that one
+    // localisation, but loop through them all to be sure.
+    if (isset($json['localisationsResponse']['localisations'])) {
+      foreach ($json['localisationsResponse']['localisations'] as $localisation) {
+        if (isset($localisation['agency'])) {
+          foreach ($localisation['agency'] as $agency) {
+            $agencyId = $agency['agencyId']['$'];
+            $localisationPid = $agency['localisationPid']['$'];
+
+            // If the agency id starts with 7, it's a public library, and we
+            // assume that if one has the material, at least one public library
+            // must have it for lending. This speeds things up immensely.
+            if (strpos($agencyId, '7') === 0) {
+              if ($debug) {
+                $res['debug'][] = sprintf('Found public library %s', $agencyId);
+              }
+
+              $res['canBeOrdered'] = TRUE;
+              break 2;
+            }
+
+            $agencyPids[] = [$agencyId, $localisationPid];
+          }
+        }
+      }
+    }
+
+    $i = 0;
+    // If we have a list of pids and agency ids, loop through until we find one
+    // that's available for ill.
+    if (!$res['canBeOrdered'] && $agencyPids) {
+      $xml = <<<EOF
+<?xml version="1.0"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://oss.dbc.dk/ns/openholdingstatus"><SOAP-ENV:Body>
+<ns1:holdingsRequest>
+%s
+  <ns1:lookupRecord>
+    <ns1:responderId>%s</ns1:responderId>
+    <ns1:pid>%s</ns1:pid>
+  </ns1:lookupRecord>
+  <ns1:outputType>json</ns1:outputType>
+</ns1:holdingsRequest>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>
+EOF;
+
+      foreach ($agencyPids as $agency) {
+        list($agencyId, $pid) = $agency;
+
+        if ($debug) {
+          $res['debug'][] = sprintf('trying %s %s', $agencyId, $pid);
+        }
+
+        $response = drupal_http_request(
+          'https://openholdingstatus.addi.dk/3.1/',
+          ['data' => sprintf($xml, $authXml, $agencyId, $pid)]
+        );
+        $json = json_decode($response->data, TRUE);
+
+        if ($debug) {
+          $res['debug'][] = $json;
+        }
+
+        if (isset($json['holdingsResponse']['responder'])) {
+          foreach ($json['holdingsResponse']['responder'] as $responder) {
+            if ($i++ > 2) break 2;
+            if ($responder['willLend']['$'] === 'true') {
+              $res['canBeOrdered'] = TRUE;
+              break 2;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  drupal_json_output($res);
 }
 
 /**

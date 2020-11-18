@@ -19,6 +19,16 @@ function ding_ill_install() {
 }
 
 /**
+ * Implements hook_uninstall().
+ */
+function ding_ill_uninstall() {
+  variable_del('ding_ill_auth_name');
+  variable_del('ding_ill_auth_pass');
+  variable_del('ding_ill_auth_group');
+}
+
+
+/**
  * Implements hook_enable().
  *
  * We need to remove the search branch blacklist as it would filter out
