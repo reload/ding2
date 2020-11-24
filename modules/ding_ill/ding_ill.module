@@ -472,7 +472,10 @@ EOF;
 
         if (isset($json['holdingsResponse']['responder'])) {
           foreach ($json['holdingsResponse']['responder'] as $responder) {
-            if ($i++ > 2) break 2;
+            if ($i++ > 2) {
+              break 2;
+            }
+
             if ($responder['willLend']['$'] === 'true') {
               $res['canBeOrdered'] = TRUE;
               break 2;
