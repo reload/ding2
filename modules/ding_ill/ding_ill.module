@@ -498,13 +498,12 @@ EOF;
 function _ding_ill_is_local($entity) {
   $is_local = &drupal_static(__FUNCTION__);
   if (!isset($is_local[$entity->getId()])) {
-    $ting_object = $entity->getTingObject();
     $local_id = $entity->getLocalId();
     $holdings = ding_availability_holdings([$local_id]);
 
     $available = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
 
-    $is_local[$entity->getId()] = $ting_object->isOnline() || $available;
+    $is_local[$entity->getId()] = $entity->is('online') || $available;
   }
 
   return $is_local[$entity->getId()];
