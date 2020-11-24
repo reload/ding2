@@ -6,6 +6,17 @@
  */
 
 /**
+ * Implements hook_init().
+ */
+function ding_ill_init() {
+  // As we can't know when a new reservation is created by the React button,
+  // we'll clear the cache whenever the user visits the reservation pages.
+  if (strpos(current_path(), 'user/') === 0 && strpos(current_path(), 'reservations') !== FALSE) {
+    ding_session_cache_clear('fbs', 'reservation');
+  }
+}
+
+/**
  * Implements hook_preprocess_html().
  */
 function ding_ill_preprocess_html(&$variables) {
