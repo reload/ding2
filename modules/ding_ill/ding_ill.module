@@ -138,6 +138,7 @@ function ding_ill_ding_entity_buttons($type, $entity) {
 
   // Determine options for the order based on user reservation
   // preferences.
+  $preferred_branch = NULL;
   try {
     $default_options = ding_provider_invoke('reservation', 'default_options',
     $user);
@@ -359,10 +360,20 @@ function ding_ill_replace_ddb_react(array $files) {
 function ding_ill_openholdingstatus(string $pids) {
   drupal_add_http_header('Access-Control-Allow-Origin', '*');
   drupal_page_is_cacheable(FALSE);
-  $debug = isset($_GET['debug']);
   $res = ['canBeOrdered' => FALSE];
+  $debug = isset($_GET['debug']);
   if ($debug) {
     $res['debug'] = [];
+  }
+  $cache_key = 'ding_ill_holdings:' . $pids;
+
+  $cache = cache_get($cache_key);
+  if (isset($cache->expire) && $cache->expire > REQUEST_TIME) {
+    if ($debug) {
+      $cache->data['debug'] = 'Found in cache ' . $cache_key;
+    }
+    drupal_json_output($cache->data);
+    return;
   }
 
   $pids = explode(',', $pids);
@@ -485,6 +496,12 @@ EOF;
       }
     }
   }
+
+  if ($debug) {
+    $res['debug'][] = 'Cached as ' . $cache_key;
+  }
+
+  cache_set($cache_key, $res, 'cache', REQUEST_TIME + 86400);
 
   drupal_json_output($res);
 }
