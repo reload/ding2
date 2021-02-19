@@ -57,3 +57,20 @@
 .js-ding-ill-material-group-items {
   width: 100% !important;
 }
+
+.ding-ill--material-group .ting-object.view-mode-collection-list {
+  margin-bottom: 0;
+}
+
+.ding-ill--material-group {
+  /* Copy bottom margin previously on .ting-object.view-mode-collection-list */
+  margin-bottom: 10px;
+}
+
+.ding-ill--material-group .js-ding-ill-material-group-items .ting-object.view-mode-collection-list .inner {
+  border-bottom: 1px solid rgba(38,38,38,.2);
+}
+
+.ding-ill--material-group .js-ding-ill-material-group-items .ting-object.view-mode-collection-list:last-child .inner {
+  border: 0;
+}
