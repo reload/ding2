@@ -25,6 +25,7 @@ function ding_ill_uninstall() {
   variable_del('ding_ill_auth_name');
   variable_del('ding_ill_auth_pass');
   variable_del('ding_ill_auth_group');
+  variable_del('ding_ill_button_help');
 }
 
 

@@ -162,7 +162,8 @@ function ding_ill_ding_entity_buttons($type, $entity) {
   }
 
   $data = [
-    'text' => t('Order material from other library'),
+    'text' => t('Reserve'),
+    'help-text' => t('The material is ordered from another library'),
     'error-text' => t('An error occurred'),
     'checking-text' => t('Checking if material can be ordered'),
     'progress-text' => t('Ordering material'),
@@ -176,6 +177,10 @@ function ding_ill_ding_entity_buttons($type, $entity) {
     'pickup-branch' => $preferred_branch,
     'expires' => $expiry->format('Y-m-d'),
   ];
+
+  // Apparently `#attached` doesn't quite work here. But we have some
+  // adjustments for the button.
+  drupal_add_css(drupal_get_path('module', 'ding_ill') . '/ding_ill.css');
 
   $build[] = ding_react_app('order-material', $data);
 
