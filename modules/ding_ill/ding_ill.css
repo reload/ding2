@@ -94,7 +94,8 @@
 
 /* The following is to make the button work in material teaser view.
    Much is stolen directly from ddbasic css. */
-.ting-object.view-mode-teaser .ddb-order-material__container a {
+.ting-object.view-mode-teaser .ddb-order-material__container a,
+.ting-object.view-mode-teaser .ddb-order-material__container div.ddb-alert {
   -webkit-transition:background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
   -moz-transition:background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
   transition:background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
@@ -129,15 +130,17 @@
 }
 
 @media screen and (max-width:600px) {
-  .ting-object.view-mode-teaser .ddb-order-material__container a {
-    float:left;
-    display:block;
-    margin-right:2.4911%;
-    width:48.75445%;
-    margin-bottom:10px;
-    padding-right:0
+  .ting-object.view-mode-teaser .ddb-order-material__container a,
+  .ting-object.view-mode-teaser .ddb-order-material__container div.ddb-alert {
+    float: left;
+    display: block;
+    margin-right: 2.4911%;
+    width: 48.75445%;
+    margin-bottom: 10px;
+    padding-right: 0;
   }
-  .ting-object.view-mode-teaser .ddb-order-material__container a:last-child {
+  .ting-object.view-mode-teaser .ddb-order-material__container a:last-child,
+  .ting-object.view-mode-teaser .ddb-order-material__container div.ddb-alert {
     margin-right:0
   }
 }
@@ -150,23 +153,27 @@
   color:#ffffff
 }
 
-.ting-object.view-mode-teaser>.inner .ddb-order-material__container a {
-  bottom:20px;
+.ting-object.view-mode-teaser>.inner .ddb-order-material__container a,
+.ting-object.view-mode-teaser .ddb-order-material__container div.ddb-alert {
+  bottom: 20px;
   right: 20px;
-  width:42%;
-  padding-right:0;
+  width: 42%;
+  padding-right: 0;
+  height: inherit;
 }
 
 .no-touch .ting-object.view-mode-teaser>.inner .ddb-order-material__container a,
+.no-touch .ting-object.view-mode-teaser>.inner .ddb-order-material__container div.ddb-alert,
 .no-touch .ting-object.view-mode-teaser>.inner .ddb-order-material__container .ddb-order-material__help {
-  position:absolute;
-  opacity:0
+  position: absolute;
+  opacity: 0;
 }
 
 .no-touch .ting-object.view-mode-teaser>.inner:hover .ddb-order-material__container a,
+.no-touch .ting-object.view-mode-teaser>.inner:hover .ddb-order-material__container div.ddb-alert,
 .no-touch .ting-object.view-mode-teaser>.inner:hover .ddb-order-material__container .ddb-order-material__help {
-  -webkit-transition:opacity .3s .7s cubic-bezier(.165,.84,.44,1),background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
-  -moz-transition:opacity .3s .7s cubic-bezier(.165,.84,.44,1),background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
-  transition:opacity .3s .7s cubic-bezier(.165,.84,.44,1),background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
-  opacity:1
+  -webkit-transition: opacity .3s .7s cubic-bezier(.165,.84,.44,1),background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
+  -moz-transition: opacity .3s .7s cubic-bezier(.165,.84,.44,1),background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
+  transition: opacity .3s .7s cubic-bezier(.165,.84,.44,1),background-color .3s cubic-bezier(.165,.84,.44,1),color .3s cubic-bezier(.165,.84,.44,1);
+  opacity: 1;
 }
