@@ -523,12 +523,27 @@ EOF;
 function _ding_ill_is_local($entity) {
   $is_local = &drupal_static(__FUNCTION__);
   if (!isset($is_local[$entity->getId()])) {
-    $local_id = $entity->getLocalId();
-    $holdings = ding_availability_holdings([$local_id]);
+    $local = FALSE;
 
-    $available = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
+    // If the pid starts with the local agency, it's local.
+    if (strpos($entity->getId(), variable_get('ting_agency', 'xxx')) === 0) {
+      $local = TRUE;
+    }
 
-    $is_local[$entity->getId()] = $entity->is('online') || $available;
+    // Online materials are always considered local.
+    if (!$local) {
+      $local = $entity->is('online');
+    }
+
+    // And if availability says we have some.
+    if (!$local) {
+      $local_id = $entity->getLocalId();
+      $holdings = ding_availability_holdings([$local_id]);
+
+      $local = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
+    }
+
+    $is_local[$entity->getId()] = $local;
   }
 
   return $is_local[$entity->getId()];
