@@ -244,9 +244,10 @@ function ding_ill_preprocess_field(&$variables) {
       }
 
       foreach ($materials as $items) {
-        foreach ($items as $object) {
+        $pids = array_keys($items);
+        foreach ($items as $pid => $object) {
           // Add the ids of related materials to materials.
-          $object->ding_ill_ids = array_keys($items);
+          $object->ding_ill_ids = (array_search($pid, $pids) === 0) ? $pids : [ $pid ];
 
           if (!isset($rendered_materials[$object->title])) {
             // Using two buckets in order to order local materials before ill
