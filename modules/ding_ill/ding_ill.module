@@ -204,12 +204,18 @@ function ding_ill_module_implements_alter(&$implementations, $hook) {
 
 /**
  * Implements hook_opensearch_pre_execute().
- *
- * When interlibrary loans are enabled, don't filter for local holdings.
  */
 function ding_ill_opensearch_pre_execute($request) {
   if ($request instanceof TingClientSearchRequest) {
+    // Do not filter for local holdings. The purpose of the interlibrary loans
+    // module is to provide access to materials outside of the current library
+    // organisation.
     $request->setFilterLocalHoldings(FALSE);
+    // Exclude specific online types from the bibliotekskatalog source which
+    // behave oddly. These are included when the local filter is removed.
+    $request->setQuery(
+      $request->getQuery() . ' not (term.acsource=bibliotekskatalog and (term.type="lydbog (net)" or term.type=ebog))'
+    );
   }
 }
 
