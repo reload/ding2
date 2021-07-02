@@ -95,6 +95,17 @@ function ding_ill_ding_entity_buttons($type, $entity) {
 
   $ting_object = $entity->getTingObject();
 
+  // Do not add a button for articles. The digital archive service (das)
+  // provides a more convenient way to retrieve such items.
+  $types = [
+    'Artikel',
+    'Avisartikel',
+    'Tidsskriftsartikel',
+  ];
+  if (in_array($ting_object->getType(), $types)) {
+    return $build;
+  }
+
   if (_ding_ill_is_local($entity)) {
     return $build;
   }
