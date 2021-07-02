@@ -543,22 +543,16 @@ function _ding_ill_is_local($entity) {
   if (!isset($is_local[$entity->getId()])) {
     $local = FALSE;
 
-    // If the pid starts with the local agency, it's local.
-    if (strpos($entity->getId(), variable_get('ting_agency', 'xxx')) === 0) {
+    if ($entity->is('online')) {
+      // Online materials are always considered local.
       $local = TRUE;
-    }
-
-    // Online materials are always considered local.
-    if (!$local) {
-      $local = $entity->is('online');
-    }
-
-    // And if availability says we have some.
-    if (!$local) {
+    } else {
+      // An item is considered local if it has holdings regardless of what the
+      // item id indicates.
       $local_id = $entity->getLocalId();
       $holdings = ding_availability_holdings([$local_id]);
-
-      $local = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
+      $has_holdings = $holdings[$local_id]['total_count'] > 0 ? TRUE : FALSE;
+      $local = $has_holdings;
     }
 
     $is_local[$entity->getId()] = $local;
