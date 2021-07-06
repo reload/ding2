@@ -78,9 +78,10 @@ projects[dynamic_background][subdir] = "contrib"
 projects[dynamic_background][version] = "2.0-rc4"
 projects[dynamic_background][patch][] = "https://www.drupal.org/files/issues/create_file_path-2410241-1.patch"
 
-; To be removed together with p2.
 projects[eck][subdir] = "contrib"
 projects[eck][version] = "2.0-rc9"
+; Avoid PDO exception after installation
+projects[eck][patch][] = "https://www.drupal.org/files/issues/eck-pdoexception-2109589-17.patch"
 
 projects[email][subdir] = "contrib"
 projects[email][version] = "1.3"
@@ -243,7 +244,7 @@ projects[media_vimeo][subdir] = "contrib"
 projects[media_vimeo][version] = "2.1"
 
 projects[media_youtube][subdir] = "contrib"
-projects[media_youtube][version] = "3.0"
+projects[media_youtube][version] = "3.10"
 
 projects[memcache][subdir] = "contrib"
 projects[memcache][version] = "1.6"
@@ -416,7 +417,7 @@ projects[tipsy][subdir] = "contrib"
 projects[tipsy][version] = "1.0-rc1"
 
 projects[token][subdir] = "contrib"
-projects[token][version] = "1.6"
+projects[token][version] = "1.8"
 
 projects[transliteration][subdir] = "contrib"
 projects[transliteration][version] = "3.2"
@@ -475,6 +476,9 @@ projects[watchdog_filtering][version] = "1.3"
 
 projects[webform][subdir] = "contrib"
 projects[webform][version] = "4.10"
+
+projects[webform_purge][subdir] = "contrib"
+projects[webform_purge][version] = "1.3"
 
 projects[workbench][subdir] = "contrib"
 projects[workbench][version] = "1.2"
@@ -673,3 +677,9 @@ libraries[fabric][download][type] = "get"
 libraries[fabric][download][url] = https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.3.2/fabric.js
 libraries[fabric][directory_name] = "fabric"
 libraries[fabric][destination] = "libraries"
+
+; Library used by Configuration import (older version to be able to run on PHP 5.6).
+libraries[yaml][download][type] = "get"
+libraries[yaml][download][url] = https://github.com/symfony/yaml/archive/v3.4.47.tar.gz
+libraries[yaml][directory_name] = "yaml"
+libraries[yaml][destination] = "libraries"

@@ -33,6 +33,8 @@ $plugin = array(
 function ding_nodelist_content_type_render($subtype, $conf, $args, $context) {
   $block = new stdClass();
 
+  $block->title = t('Latest');
+
   // Prepare classes for widget container.
   $classes = array();
   $classes[] = 'ding_nodelist';
@@ -401,7 +403,9 @@ function _ding_nodelist_content_type_form_save(&$form_state, $rebuild = FALSE) {
 
   $form_state['conf']['limit'] = $form_state['values']['limit'];
   $form_state['conf']['more_links'] = !empty($form_state['values']['more_links']) ? $form_state['values']['more_links'] : array();
+  $form_state['conf']['override_title'] = $form_state['values']['override_title'];
   $form_state['conf']['override_title_text'] = $form_state['values']['override_title_text'];
+  $form_state['conf']['override_title_heading'] = $form_state['values']['override_title_heading'];
   $form_state['conf']['selected_nodes'] = !empty($form_state['values']['selected_nodes']) && $form_state['conf']['nodes_switch'] ? $form_state['values']['selected_nodes'] : array();
   $form_state['conf']['sort_field'] = $form_state['values']['sort_field'];
   $form_state['conf']['sort_order'] = $form_state['values']['sort_order'];
@@ -510,7 +514,7 @@ function _ding_nodelist_plugin_widget_section(&$form, $node_type, $conf, $defaul
     '#suffix' => '</div></div>',
   );
 
-  $autoscrolling_widgets = array(DING_NODELIST_WIDGET_CAROUSEL);
+  $autoscrolling_widgets = array(DING_NODELIST_WIDGET_CAROUSEL, DING_NODELIST_WIDGET_ROLLTAB);
   if (in_array($widget_type, $autoscrolling_widgets)) {
     $generic_autoscroll_delay = variable_get('ding_nodelist_' . $widget_type . '_delay', $default_conf['autoscroll_delay']);
     $form['ding_nodelist_wrapper']['widget_dependent']['autoscroll_delay'] = array(

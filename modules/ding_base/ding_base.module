@@ -432,7 +432,7 @@ function ding_base_pathauto_alias_alter(&$alias, array &$context) {
  *
  * Mainly used by ding_groups.
  *
- * @param Entity $node
+ * @param stdClass $node
  *   Node entity object for the OG group that should have alias updated.
  * @param string $base
  *   Base path for the group (e.g. library or temaer).
@@ -443,7 +443,7 @@ function ding_base_pathauto_alias_alter(&$alias, array &$context) {
  *
  * @todo: used it in ding_libraries to remove the "slug" field.
  */
-function ding_base_updated_taxonomy_aliases(Entity $node, $base, array $terms, array $slugs) {
+function ding_base_updated_taxonomy_aliases(stdClass $node, $base, array $terms, array $slugs) {
   $group_alias = 'node/' . $node->nid;
 
   // Find node pattern from path auto.
@@ -617,7 +617,7 @@ function ding_base_field_widget_form_alter(&$elements, &$form_state, $context) {
       $display = !empty($displays) ? reset($displays) : NULL;
     }
 
-    if (!empty($display)) {
+    if (!empty($display) && isset($display['settings']['styles']['max_style'])) {
       // We will use functionality of image module.
       $style = image_style_load($display['settings']['styles']['max_style']);
       // Let's use sample file from image module, for applying all effects.

@@ -20,13 +20,35 @@ function ting_subsearch_menu() {
     'access arguments' => array('access content'),
   ];
 
+  $items['admin/config/ding/subsearch'] = [
+    'title' => 'Ting subsearch',
+    'description' => 'Configure subsearch modules.',
+    'page callback' => 'ting_subsearch_admin_overview',
+    'access arguments' => array('configure ting subsearch'),
+  ];
+  $items['admin/config/ding/subsearch/subsearch'] = [
+    'title' => 'Overview',
+    'description' => 'Ting subsearch overview',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  ];
+
   return $items;
+}
+
+/**
+ * Ting subsearch admin overview page.
+ */
+function ting_subsearch_admin_overview() {
+  return [
+    '#markup' => t('Subsearch modules allow additional searches to be made based on predefined conditions.'),
+  ];
 }
 
 /**
  * Implements hook_permission().
  */
-function ting_subseach_permission() {
+function ting_subsearch_permission() {
   return [
     'configure ting subsearch' => [
       'title' => t('Configure ting subsearch'),
@@ -192,21 +214,21 @@ function ting_subsearch_ajax_placeholder_callback() {
  *   The result object of the subsearch.
  */
 function ting_subseach_do_subsearch(TingSearchRequest $subsearch_request) {
+  $reset_alter_request = FALSE;
   if (module_exists('ting_field_search')) {
-    // If a profile is active but no context is set, we set our own to ensure
-    // ting_field_search will activate.
-    if (ting_field_search_get_active_profile() && !ting_field_search_get_context()) {
-      ting_field_search_set_context('ting_subsearch');
+
+    // If a profile is active ensure ting_field_search will alter request. If
+    // we activate it, ensure we reset again after subsearch.
+    if (ting_field_search_get_active_profile() && !ting_field_search_set_alter_request()) {
+      ting_field_search_set_alter_request(TRUE);
+      $reset_alter_request = TRUE;
     }
   }
 
   $subsearch_result = $subsearch_request->execute();
 
-  if (module_exists('ting_field_search')) {
-    // If we used our own context remove it again.
-    if (ting_field_search_get_context() == 'ting_subsearch') {
-      ting_field_search_set_context(NULL);
-    }
+  if ($reset_alter_request) {
+    ting_field_search_set_alter_request(FALSE);
   }
 
   return $subsearch_result;
