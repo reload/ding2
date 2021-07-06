@@ -5,6 +5,10 @@
  * Module for interlibrary loans.
  */
 
+use OpenSearch\OpenSearchTingObject;
+use OpenSearch\OpenSearchTingObjectCollection;
+use Ting\TingObjectInterface;
+
 /**
  * Implements hook_init().
  */
@@ -53,6 +57,93 @@ function ding_ill_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_ting_collection_view_alter().
+ */
+function ding_ill_ting_collection_view_alter(&$build) {
+  global $language;
+
+  // Replace all local objects without holdings with a corresponding basis
+  // object shared between libraries.
+  /* @var \TingCollection $collection */
+  $collection = $build['#object'];
+  $objects = $collection->getTingObjectCollection()->getObjects();
+
+
+  $local_objects = array_filter(
+    $objects,
+    function(TingObjectInterface $object) {
+      return variable_get('ting_agency', -1) === $object->getOwnerId();
+    }
+  );
+
+  // Identify local objects which do not have any holdings. Only if any of these
+  // are present do we want to consider doing any actual replacement as that
+  // introduces complexity, potential errors and performance penalties due to
+  // extra external webservice requests.
+  $local_objects_without_holdings = array_filter(
+    $local_objects,
+    function(TingObjectInterface $object) {
+      $local_id = $object->getSourceId();
+      $holdings = ding_availability_holdings([$local_id]);
+      return $holdings[$local_id]['total_count'] == 0;
+    }
+  );
+  if (count($local_objects_without_holdings) == 0) {
+    return;
+  }
+
+  // Identify local objects which have a corresponding basis object.
+  // To work with all the objects we need all of them as TingClientObject
+  // instances. That conversion also happens here.
+  $new_objects = array_map(function(OpenSearchTingObject $object) {
+    $basis_object = FALSE;
+    if (variable_get('ting_agency', -1) === $object->getOwnerId()) {
+      // Basis objects are always prefixed with 870970-basis: followed by the
+      // faust nummer. In our case this is the source id.
+      $basis_id = "870970-basis:" . $object->getSourceId();
+      $basis_object = opensearch_get_object($basis_id);
+    }
+    // Return the basis object or a TingClientObject instance of the local
+    // object.
+    return $basis_object ?: opensearch_get_object($object->getId());
+  }, $objects);
+
+  // Check if we actually did any replacement. If not then bail to avoid further
+  // modifications.
+  $objects_modified = array_map(function(OpenSearchTingObject $a, TingClientObject $b) {
+    return $a->getId() !== $b->id;
+  }, $objects, $new_objects);
+  if (count(array_filter($objects_modified)) === 0) {
+    return;
+  }
+
+  // Build a new collection based on the new objects. As many as possible should
+  // either be local objects with holdings or basis objects.
+  $new_collection = new TingCollection(
+    $collection->getId(),
+    new OpenSearchTingObjectCollection(
+      new TingClientObjectCollection(
+        $new_objects
+      )
+    )
+  );
+
+  $build['#object'] = $new_collection;
+
+  // Rerender the collection field with the new collection and merge the result
+  // into the build array.
+  // Some entries collide when the old and new field are merged unset them to
+  // keep the proper values.
+  $field = field_attach_view('ting_collection', $new_collection, $build['#view_mode'], $language->language);
+  unset($field['ting_entities']['#items']);
+  unset($build['ting_entities'][0]);
+  $build = drupal_array_merge_deep(
+    $build,
+    $field
+  );
 }
 
 /**

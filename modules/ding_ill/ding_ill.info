@@ -2,3 +2,4 @@ name = Ding Interlibrary Loan
 description = Provides interlibrary loan functionality
 core = 7.x
 dependencies[] = ding_react
+dependencies[] = opensearch
