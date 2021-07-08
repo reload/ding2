@@ -67,6 +67,11 @@ function ding_ill_ting_collection_view_alter(&$build) {
 
   // Replace all local objects without holdings with a corresponding basis
   // object shared between libraries.
+  // This should only occur on the collection view so pass for other paths.
+  if (strpos(current_path(), 'ting/collection') !== 0) {
+    return;
+  }
+
   /* @var \TingCollection $collection */
   $collection = $build['#object'];
   $objects = $collection->getTingObjectCollection()->getObjects();
