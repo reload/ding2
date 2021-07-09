@@ -60,6 +60,50 @@ function ding_ill_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function ding_ill_menu_alter(&$items) {
+  // Replace a page callback with our own. This way we do not have to check on
+  // every request as if we used hook_init().
+  $items['ting/object/%ting_object'] = array_merge(
+    $items['ting/object/%ting_object'],
+    [
+      'page callback' => 'ding_ill_ting_object_page_view',
+      // Pass the original page callback as an argument. This allows the
+      // overrider to call the original.
+      'page arguments' => [2, $items['ting/object/%ting_object']['page callback']],
+    ]
+  );
+}
+
+/**
+ * Custom ting object view page callback
+ *
+ * @param \TingEntity $object
+ *   The object being viewed.
+ * @param string $original_callback
+ *   The name of the original callback.
+ */
+function ding_ill_ting_object_page_view($object, $original_callback) {
+  // Redirect local items without holdings to a basis item if available.
+  $is_local_object = variable_get('ting_agency', -1) === $object->getOwnerId();
+  if ($is_local_object) {
+    $local_id = $object->getLocalId();
+    $holdings = ding_availability_holdings([$local_id]);
+    $has_holdings = $holdings[$local_id]['total_count'] > 0;
+    if (!$has_holdings) {
+      $basis_id = "870970-basis:" . $object->getLocalId();
+      $basis_object = opensearch_get_object($basis_id);
+      if ($basis_object) {
+        drupal_goto('ting/object/' . $basis_object->id);
+      }
+    }
+  }
+
+  return call_user_func($original_callback, $object);
+}
+
+/**
  * Implements hook_ting_collection_view_alter().
  */
 function ding_ill_ting_collection_view_alter(&$build) {
